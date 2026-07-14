@@ -286,7 +286,7 @@ const server = http.createServer(async (req, res) => {
       try {
         const file = await readFile(filePath);
         const ext = filePath.split(".").pop().toLowerCase();
-        const mimeTypes = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif" };
+        const mimeTypes = { jpg: "image/jpeg", jpeg: "image/jpeg", png: "image/png", webp: "image/webp", gif: "image/gif", svg: "image/svg+xml", woff2: "font/woff2", woff: "font/woff" };
         const mime = mimeTypes[ext] || "application/octet-stream";
         res.writeHead(200, { "content-type": mime }).end(file);
       } catch {

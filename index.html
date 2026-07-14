@@ -7,8 +7,23 @@
 <meta name="apple-mobile-web-app-title" content="받아쓰기" />
 <meta name="theme-color" content="#448AFF" />
 <link rel="manifest" href="/manifest.json" />
+<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml" />
+<link rel="apple-touch-icon" href="/assets/icon-180.png" />
 <title>받아쓰기 연습</title>
 <style>
+  @font-face {
+    font-family: "Hakgyoansim Badasseugi";
+    src: url("/assets/fonts/HakgyoansimBadasseugi-Light.woff2") format("woff2");
+    font-weight: 400;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: "Hakgyoansim Badasseugi";
+    src: url("/assets/fonts/HakgyoansimBadasseugi-Bold.woff2") format("woff2");
+    font-weight: 700;
+    font-display: swap;
+  }
+
   /* Voxel Gamified Isometric Design System */
   :root {
     --primary: #E8F0FE;
@@ -25,7 +40,7 @@
     --r-lg: 12px;
     --r-full: 9999px;
 
-    --sans: "Nunito", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+    --sans: "Hakgyoansim Badasseugi", "Nunito", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -263,10 +278,11 @@
   @keyframes spin { to { transform: rotate(360deg); } }
 
   * { box-sizing: border-box; }
+  button, input, select, textarea { font-family: inherit; font-size: inherit; }
   [hidden] { display: none !important; }
   .tabs:empty, .grouptitle:empty { display: none; }
 
-  html { color-scheme: light dark; }
+  html { color-scheme: light dark; font-size: 112.5%; } /* 16px → 18px base; most sizes below are rem so this scales everything */
 
   body {
     margin: 0 auto;
@@ -561,7 +577,7 @@
   .txt {
     flex: 1;
     color: var(--secondary);
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     line-height: 1.5;
     font-weight: 400;
   }
@@ -1532,7 +1548,7 @@
 </div>
 
 <div class="button-group-lg">
-  <button id="showRandomBtn" class="btn-ghost button-row-shrink btn-sm">랜덤 생성</button>
+  <button id="showRandomBtn" class="btn-ghost button-row-shrink btn-sm">문제 랜덤 생성하기</button>
 </div>
 
 <div class="controls controls-hidden random-controls" id="randomControls">
@@ -1542,7 +1558,7 @@
     <input type="range" id="randomCount" min="5" max="30" step="5" value="10" />
     <span class="val" id="countVal">10문제</span></div>
   <div class="actions">
-    <button class="btn-primary" id="generateRandom">랜덤 생성</button>
+    <button class="btn-primary" id="generateRandom">문제 랜덤 생성하기</button>
     <button class="btn-ghost" id="closeRandom">취소</button>
   </div>
 </div>
@@ -1554,12 +1570,12 @@
 
 <div class="controls" id="controls" hidden>
   <div class="row"><label>읽기 속도</label>
-    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="0.8" />
-    <span class="val" id="rateV">0.8x</span></div>
+    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="1" />
+    <span class="val" id="rateV">1x</span></div>
   <div class="row"><label>반복 횟수</label>
-    <input type="range" id="rep" min="1" max="3" step="1" value="2" />
-    <span class="val" id="repV">2회</span></div>
-  <div class="row"><label>쓰기 간격</label>
+    <input type="range" id="rep" min="1" max="3" step="1" value="1" />
+    <span class="val" id="repV">1회</span></div>
+  <div class="row"><label>반복 대기</label>
     <input type="range" id="gap" min="2" max="10" step="1" value="5" />
     <span class="val" id="gapV">5초</span></div>
   <div class="row"><label>음성</label>
@@ -1567,7 +1583,7 @@
   <div class="row"><label>정답 보기</label>
     <input type="checkbox" id="reveal" /></div>
   <div class="actions">
-    <button class="btn-primary" id="playAll">이 급수 자동재생</button>
+    <button class="btn-primary" id="playAll">자동재생</button>
     <button class="btn-ghost" id="stop">정지</button>
     <button class="btn-ghost" id="shuffleBtn">순서섞기</button>
     <button class="btn-ghost" id="save">저장</button>
@@ -1584,7 +1600,11 @@
 const $ = (id) => document.getElementById(id);
 let groups = [];      // [{title, problems:[{number,text}]}]
 let current = 0;      // selected group index
-let stopped = false;
+// playGen: bumped by stop() to invalidate any in-flight read loop. A plain
+// "stopped" boolean races when individual-play interrupts auto-play — cancel()
+// fires onend asynchronously, so a boolean flipped back to false by the new
+// playback could let the just-stopped loop's pending await resume anyway.
+let playGen = 0;
 let isPlayingAll = false; // 통합 자동재생 중인지 여부 (개별 재생과 구분)
 let isProcessing = false; // OCR 분석 중 여부
 const curProblems = () => (groups[current]?.problems ?? []);
@@ -1660,16 +1680,15 @@ function speak(text, rate) {
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
 // Read once problem: N repeats with a writing gap between them.
-async function readProblem(text) {
-  const rate = +$("rate").value, reps = +$("rep").value, gap = +$("gap").value * 1000;
-  for (let i = 0; i < reps && !stopped; i++) {
+async function readProblem(text, rate, reps, gap, myGen) {
+  for (let i = 0; i < reps && myGen === playGen; i++) {
     await speak(text, rate);
-    if (i < reps - 1 && !stopped) await wait(gap);
+    if (i < reps - 1 && myGen === playGen) await wait(gap);
   }
 }
 
 function stop() {
-  stopped = true;
+  playGen++;
   isPlayingAll = false;
   speechSynthesis.cancel();
   setActive(-1);
@@ -1759,7 +1778,7 @@ function goHome() {
 function setActive(idx) {
   [...$("list").children].forEach((el, i) => {
     el.classList.toggle("active", i === idx);
-    el.querySelector(".play").classList.toggle("playing", i === idx && !stopped);
+    el.querySelector(".play").classList.toggle("playing", i === idx);
   });
 }
 
@@ -1770,7 +1789,7 @@ function updatePlayBtn() {
     btn.textContent = "■ 정지";
   } else {
     btn.classList.remove("playing");
-    btn.textContent = "▶ 이 급수 자동재생";
+    btn.textContent = "▶ 자동재생";
   }
 }
 
@@ -1807,7 +1826,12 @@ function render() {
     card.append(numDiv, txt, playBtn);
     txt.onclick = () => txt.classList.remove("hidden"); // tap to peek
     playBtn.onclick = async () => {
-      stop(); stopped = false; setActive(i); await readProblem(p.text); setActive(-1);
+      // 개별 재생은 자동재생 설정(속도/반복)과 무관하게 항상 0.8배속 1회 고정.
+      stop(); // 자동재생 중이었다면 멈춤
+      const myGen = playGen;
+      setActive(i);
+      await readProblem(p.text, 0.8, 1, 0, myGen);
+      if (myGen === playGen) setActive(-1);
     };
     $("list").appendChild(card);
   });
@@ -1816,19 +1840,22 @@ function render() {
 }
 
 async function playAll() {
-  stop(); stopped = false;
+  stop(); // 개별 재생 중이었다면 멈춤
+  const myGen = playGen;
   isPlayingAll = true;
   updatePlayBtn();
   const problems = curProblems();
-  const gap = +$("gap").value * 1000;
-  for (let i = 0; i < problems.length && !stopped; i++) {
+  const rate = +$("rate").value, reps = +$("rep").value, gap = +$("gap").value * 1000;
+  for (let i = 0; i < problems.length && myGen === playGen; i++) {
     setActive(i);
-    await readProblem(problems[i].text);
-    if (i < problems.length - 1 && !stopped) await wait(gap);
+    await readProblem(problems[i].text, rate, reps, gap, myGen);
+    if (i < problems.length - 1 && myGen === playGen) await wait(gap);
   }
-  setActive(-1);
-  isPlayingAll = false;
-  updatePlayBtn();
+  if (myGen === playGen) {
+    setActive(-1);
+    isPlayingAll = false;
+    updatePlayBtn();
+  }
 }
 
 // ---- 방어 로직: 너무 빈번한 요청 차단 ----
@@ -2234,11 +2261,11 @@ $("randomCount").oninput = () => {
 };
 
 $("showRandomBtn").onclick = () => {
-  $("randomControls").style.display = $("randomControls").style.display === "none" ? "grid" : "none";
+  $("randomControls").classList.toggle("controls-hidden");
 };
 
 $("closeRandom").onclick = () => {
-  $("randomControls").style.display = "none";
+  $("randomControls").classList.add("controls-hidden");
 };
 
 // 생성된 문제 저장 시 사용할 학년 (임시)
@@ -2267,7 +2294,7 @@ $("viewProblemsBtn").onclick = () => {
     current = 0;
     $("status").textContent = `${groups[0].title}`;
     showNav(groups[0].title);
-    $("randomControls").style.display = "none";
+    $("randomControls").classList.add("controls-hidden");
     render();
   }
 };
@@ -2340,7 +2367,7 @@ $("generateRandom").onclick = async () => {
 
     // 모달 표시
     showGeneratedProblemModal(grade, count);
-    $("randomControls").style.display = "none";
+    $("randomControls").classList.add("controls-hidden");
   } catch (err) {
     $("status").textContent = "오류: " + err.message;
   } finally {

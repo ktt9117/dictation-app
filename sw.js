@@ -1,5 +1,15 @@
-const CACHE_NAME = "dictation-v1";
-const ASSETS_TO_CACHE = ["/", "/index.html", "/manifest.json"];
+const CACHE_NAME = "dictation-v3";
+const ASSETS_TO_CACHE = [
+  "/",
+  "/index.html",
+  "/manifest.json",
+  "/assets/fonts/HakgyoansimBadasseugi-Light.woff2",
+  "/assets/fonts/HakgyoansimBadasseugi-Bold.woff2",
+  "/assets/favicon.svg",
+  "/assets/icon-180.png",
+  "/assets/icon-192.png",
+  "/assets/icon-512.png",
+];
 
 // 설치: 필수 자산 캐싱
 self.addEventListener("install", (e) => {
