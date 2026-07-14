@@ -135,7 +135,7 @@
   .status {
     min-height: 1.25rem;
     padding: 0.75rem 0.5rem;
-    color: var(--neutral);
+    color: var(--secondary);
     font-size: 0.9rem;
     font-weight: 500;
   }
@@ -544,6 +544,154 @@
     border-color: rgba(68, 138, 255, 0.3);
   }
 
+  /* Modal styles */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .modal-content {
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: 8px;
+    padding: 24px;
+    font-family: var(--sans);
+    color: var(--secondary);
+    box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);
+  }
+
+  .modal-title {
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 16px;
+    color: var(--neutral);
+  }
+
+  .modal-title.warning {
+    color: var(--accent);
+  }
+
+  .modal-description {
+    font-size: 12px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+  }
+
+  .modal-actions {
+    display: flex;
+    gap: 8px;
+    flex-direction: column;
+  }
+
+  /* Home saved list styles */
+  .home-saved-container {
+    display: flex;
+    gap: 0.5rem;
+    align-items: stretch;
+  }
+
+  .home-saved-btn {
+    flex: 1;
+    text-align: left;
+    padding: 0.75rem;
+    border-radius: 8px;
+  }
+
+  .home-saved-btn-title {
+    font-weight: 700;
+    color: var(--secondary);
+  }
+
+  .home-saved-btn-meta {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-top: 0.25rem;
+    color: var(--neutral);
+  }
+
+  .home-saved-delete {
+    flex: 0 0 40px;
+    padding: 0.75rem 0.5rem;
+    font-size: 16px;
+    color: var(--accent);
+  }
+
+  /* Photo guide checklist */
+  .photo-guide-checklist {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .photo-guide-checklist-col {
+    flex: 1;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--secondary);
+  }
+
+  .photo-guide-checklist-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .photo-guide-checklist-title.good {
+    color: var(--tertiary);
+  }
+
+  .photo-guide-checklist-title.bad {
+    color: var(--accent);
+  }
+
+  .photo-guide-examples {
+    margin-bottom: 16px;
+  }
+
+  .photo-guide-examples-title {
+    color: var(--neutral);
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-size: 12px;
+  }
+
+  .photo-guide-examples-grid {
+    display: flex;
+    gap: 12px;
+  }
+
+  .photo-guide-example-item {
+    flex: 1;
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(68, 138, 255, 0.04);
+  }
+
+  .photo-guide-example-img {
+    width: 100%;
+    height: 150px;
+    display: block;
+    object-fit: contain;
+    padding: 8px;
+  }
+
+  .photo-guide-example-label {
+    padding: 8px;
+    font-size: 10px;
+    text-align: center;
+    color: var(--tertiary);
+    border-top: 1px solid rgba(68, 138, 255, 0.15);
+    background: rgba(105, 240, 174, 0.04);
+  }
+
   @media (max-width: 52rem) {
     .layout {
       flex-direction: column;
@@ -562,43 +710,43 @@
   <div style="font-size: 12px; opacity: 0.9;">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
 </div>
 
-<div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
-  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 320px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);">
-    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--accent);">⚠️ 정말 삭제하시겠어요?</div>
-    <div id="deleteConfirmName" style="font-size: 12px; margin-bottom: 20px; opacity: 0.8;"></div>
-    <div style="display: flex; gap: 8px;">
-      <button id="deleteConfirmYes" class="btn-primary" style="flex: 1; padding: 10px; font-size: 11px;">삭제</button>
-      <button id="deleteConfirmNo" class="btn-ghost" style="flex: 1; padding: 10px; font-size: 11px;">취소</button>
+<div id="deleteConfirmModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 320px;">
+    <div class="modal-title warning">⚠️ 정말 삭제하시겠어요?</div>
+    <div id="deleteConfirmName" class="modal-description"></div>
+    <div class="modal-actions">
+      <button id="deleteConfirmYes" class="btn-primary" style="padding: 10px;">삭제</button>
+      <button id="deleteConfirmNo" class="btn-ghost" style="padding: 10px;">취소</button>
     </div>
   </div>
 </div>
 
-<div id="generatedProblemModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
-  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 320px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);">
-    <div id="generatedProblemMessage" style="font-size: 14px; font-weight: 700; margin-bottom: 20px; color: var(--neutral); text-align: center;"></div>
-    <div style="display: flex; gap: 8px; flex-direction: column;">
-      <button id="viewProblemsBtn" class="btn-primary" style="padding: 12px; font-size: 12px; font-weight: 700;">문제 바로보기</button>
-      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 12px; font-size: 12px; font-weight: 700;">저장하기</button>
+<div id="generatedProblemModal" class="modal-overlay">
+  <div class="modal-content" style="max-width: 320px;">
+    <div id="generatedProblemMessage" class="modal-title"></div>
+    <div class="modal-actions">
+      <button id="viewProblemsBtn" class="btn-primary" style="padding: 12px;">문제 바로보기</button>
+      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 12px;">저장하기</button>
     </div>
   </div>
 </div>
 
-<div id="photoGuideModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center; overflow-y: auto;">
-  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 900px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15); margin: 20px auto;">
-    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--neutral);">사진 인식 가이드</div>
+<div id="photoGuideModal" class="modal-overlay" style="overflow-y: auto;">
+  <div class="modal-content" style="max-width: 900px; margin: 20px auto;">
+    <div class="modal-title">사진 인식 가이드</div>
 
     <!-- 두 개의 체크리스트를 가로로 -->
-    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
-      <div style="flex: 1; font-size: 12px; line-height: 1.6;">
-        <div style="color: #69F0AE; font-weight: 600; margin-bottom: 6px;">✓ 잘 인식되는 사진</div>
+    <div class="photo-guide-checklist">
+      <div class="photo-guide-checklist-col">
+        <div class="photo-guide-checklist-title good">✓ 잘 인식되는 사진</div>
         <div>• 문제지가 바닥과 평행</div>
         <div>• 네 모서리가 모두 보임</div>
         <div>• 밝고 균등한 조명</div>
         <div>• 그림자가 없음</div>
         <div>• 텍스트가 명확함</div>
       </div>
-      <div style="flex: 1; font-size: 12px; line-height: 1.6;">
-        <div style="color: #FF7043; font-weight: 600; margin-bottom: 6px;">⚠️ 피해야 할 사진</div>
+      <div class="photo-guide-checklist-col">
+        <div class="photo-guide-checklist-title bad">⚠️ 피해야 할 사진</div>
         <div>• 비스듬한 각도</div>
         <div>• 손가락이나 물체가 가림</div>
         <div>• 어두운 조명 또는 역광</div>
@@ -608,9 +756,9 @@
     </div>
 
     <!-- 팁 섹션 -->
-    <div style="background: linear-gradient(135deg, rgba(68, 138, 255, 0.08), rgba(105, 240, 174, 0.08)); border: 1px solid rgba(68, 138, 255, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 11px;">
-      <div style="color: #448AFF; font-weight: 600; margin-bottom: 6px;">💡 촬영 팁</div>
-      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+    <div style="background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.85rem;">
+      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 6px;">💡 촬영 팁</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap; color: var(--secondary);">
         <div>• 흰색 바닥에 놓고 찍기</div>
         <div>• 밝은 조명 활용</div>
         <div>• 위에서 내려다보며 촬영</div>
@@ -619,21 +767,21 @@
     </div>
 
     <!-- 사진 예시를 가로로 -->
-    <div style="margin-bottom: 16px;">
-      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 12px; font-size: 12px;">예시 사진</div>
-      <div style="display: flex; gap: 12px;">
-        <div style="flex: 1; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 4px; overflow: hidden; background: rgba(68, 138, 255, 0.04);">
-          <img src="/assets/dictation-simple-sample.png" style="width: 100%; height: 150px; display: block; object-fit: contain; padding: 8px;" alt="받아쓰기 급수표 예시" />
-          <div style="padding: 8px; font-size: 10px; text-align: center; color: var(--tertiary); border-top: 1px solid rgba(68, 138, 255, 0.1);">급수표 (좋음)</div>
+    <div class="photo-guide-examples">
+      <div class="photo-guide-examples-title">예시 사진</div>
+      <div class="photo-guide-examples-grid">
+        <div class="photo-guide-example-item">
+          <img src="/assets/dictation-simple-sample.png" class="photo-guide-example-img" alt="받아쓰기 급수표 예시" />
+          <div class="photo-guide-example-label">급수표 (좋음)</div>
         </div>
-        <div style="flex: 1; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 4px; overflow: hidden; background: rgba(68, 138, 255, 0.04);">
-          <img src="/assets/dictation-multi-sample.jpg" style="width: 100%; height: 150px; display: block; object-fit: contain; padding: 8px;" alt="받아쓰기 연습지 예시" />
-          <div style="padding: 8px; font-size: 10px; text-align: center; color: var(--tertiary); border-top: 1px solid rgba(68, 138, 255, 0.1);">연습지 (좋음)</div>
+        <div class="photo-guide-example-item">
+          <img src="/assets/dictation-multi-sample.jpg" class="photo-guide-example-img" alt="받아쓰기 연습지 예시" />
+          <div class="photo-guide-example-label">연습지 (좋음)</div>
         </div>
       </div>
     </div>
 
-    <button id="closeGuideBtn" class="btn-primary" style="width: 100%; padding: 12px; font-size: 12px; font-weight: 700;">닫기</button>
+    <button id="closeGuideBtn" class="btn-primary" style="width: 100%; padding: 12px; font-size: 12px; font-weight: 700; margin-top: 16px;">닫기</button>
   </div>
 </div>
 
@@ -872,7 +1020,7 @@ function deleteSet(idx) {
   localStorage.setItem(KEY, JSON.stringify(sets));
   hideDeleteConfirm();
   renderSaved();
-  $("status").innerHTML = `<strong style="color:var(--cyan)">✓ 세트가 삭제되었습니다</strong>`;
+  $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ 세트가 삭제되었습니다</strong>`;
 }
 
 function shuffleProblems() {
@@ -890,7 +1038,7 @@ function shuffleProblems() {
     p.number = idx + 1;
   });
 
-  $("status").innerHTML = `<strong style="color:var(--cyan)">✓ 문제 순서를 섞었습니다</strong>`;
+  $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ 문제 순서를 섞었습니다</strong>`;
   render();
 }
 
@@ -1059,9 +1207,9 @@ $("file").onchange = async (e) => {
   $("list").innerHTML = ""; $("tabs").innerHTML = ""; $("groupTitle").textContent = "";
   $("controls").hidden = true;
   const started = Date.now();
-  $("status").innerHTML = `<strong style="color:var(--cyan)">${file.name}</strong>`;
+  $("status").innerHTML = `<strong style="color:var(--secondary)">${file.name}</strong>`;
   const setBusy = (msg) =>
-    ($("status").innerHTML = `<strong style="color:var(--cyan)">${file.name}</strong><br/><span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
+    ($("status").innerHTML = `<strong style="color:var(--secondary)">${file.name}</strong><br/><span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
   setBusy("사진을 준비하는 중…");
   const timer = setInterval(() => {
     if ($("status").querySelector(".spin"))
@@ -1089,7 +1237,7 @@ $("file").onchange = async (e) => {
     const extractedHash = hashGroups(extracted);
     const existingSet = sets.find(s => hashGroups(s.groups) === extractedHash);
     if (existingSet) {
-      $("status").innerHTML = `<strong style="color:var(--signal)">⚠️ 이미 저장된 세트</strong> — "${existingSet.name}" 세트와 동일한 문제입니다. 불러올까요?<br/>`;
+      $("status").innerHTML = `<strong style="color:var(--accent)">⚠️ 이미 저장된 세트</strong> — "${existingSet.name}" 세트와 동일한 문제입니다. 불러올까요?<br/>`;
       const loadBtn = document.createElement("button");
       loadBtn.className = "btn-primary";
       loadBtn.textContent = "✓ 불러오기";
@@ -1139,20 +1287,25 @@ function renderSaved() {
 
     // 홈 화면 버튼 (더 중요한 UI)
     const homeContainer = document.createElement("div");
-    homeContainer.style.cssText = "display: flex; gap: 8px; align-items: stretch;";
+    homeContainer.className = "home-saved-container";
 
     const homeBtn = document.createElement("button");
-    homeBtn.className = "btn-ghost";
-    homeBtn.style.cssText = "flex: 1; text-align: left; padding: 12px;";
-    homeBtn.innerHTML = `<div style="font-weight: 600;">${s.name}</div><div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">${s.groups.length}급수 · ${count}문제</div>`;
+    homeBtn.className = "btn-ghost home-saved-btn";
+    const titleDiv = document.createElement("div");
+    titleDiv.className = "home-saved-btn-title";
+    titleDiv.textContent = s.name;
+    const metaDiv = document.createElement("div");
+    metaDiv.className = "home-saved-btn-meta";
+    metaDiv.textContent = `${s.groups.length}급수 · ${count}문제`;
+    homeBtn.appendChild(titleDiv);
+    homeBtn.appendChild(metaDiv);
     homeBtn.onclick = loadSet;
     homeBtn.dataset.name = s.name;
     homeBtn.dataset.groups = JSON.stringify(s.groups);
 
     const deleteBtn = document.createElement("button");
-    deleteBtn.className = "btn-ghost";
+    deleteBtn.className = "btn-ghost home-saved-delete";
     deleteBtn.textContent = "✕";
-    deleteBtn.style.cssText = "flex: 0 0 40px; padding: 12px 8px; font-size: 16px; color: var(--hot-pink);";
     deleteBtn.onclick = (e) => {
       e.stopPropagation();
       showDeleteConfirm(s.name, idx);
@@ -1212,7 +1365,7 @@ $("saveWithGrade").onclick = async () => {
     const data = await r.json();
     if (data.error) throw new Error(data.error);
 
-    $("status").innerHTML = `<strong style="color:var(--cyan)">✓ ${grade}에 저장되었습니다</strong>`;
+    $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ ${grade}에 저장되었습니다</strong>`;
     $("gradeSelectUI").style.display = "none";
 
     // 로컬에도 세트 저장 (홈화면 목록에 표시하기 위해)
@@ -1429,7 +1582,7 @@ $("saveGeneratedBtn").onclick = async () => {
     const data = await r.json();
     if (data.error) throw new Error(data.error);
 
-    $("status").innerHTML = `<strong style="color:var(--cyan)">✓ ${grade}에 저장되었습니다</strong>`;
+    $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ ${grade}에 저장되었습니다</strong>`;
 
     // 로컬에도 세트 저장
     const sets = getSets();
