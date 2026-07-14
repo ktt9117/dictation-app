@@ -552,7 +552,8 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
     z-index: 9999;
     align-items: center;
     justify-content: center;
@@ -560,19 +561,20 @@
 
   .modal-content {
     background: white;
-    border: 1px solid rgba(68, 138, 255, 0.2);
-    border-radius: 8px;
-    padding: 24px;
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: 12px;
+    padding: 1.5rem;
     font-family: var(--sans);
     color: var(--secondary);
-    box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);
+    box-shadow: 0 12px 32px rgba(68, 138, 255, 0.12);
   }
 
   .modal-title {
-    font-size: 14px;
+    font-size: 1.05rem;
     font-weight: 700;
-    margin-bottom: 16px;
+    margin-bottom: 1rem;
     color: var(--neutral);
+    letter-spacing: -0.01em;
   }
 
   .modal-title.warning {
@@ -580,14 +582,15 @@
   }
 
   .modal-description {
-    font-size: 12px;
-    margin-bottom: 20px;
-    opacity: 0.8;
+    font-size: 0.9rem;
+    margin-bottom: 1.25rem;
+    opacity: 0.85;
+    line-height: 1.5;
   }
 
   .modal-actions {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
     flex-direction: column;
   }
 
@@ -627,20 +630,22 @@
   /* Photo guide checklist */
   .photo-guide-checklist {
     display: flex;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 1.5rem;
+    margin-bottom: 1.5rem;
   }
 
   .photo-guide-checklist-col {
     flex: 1;
-    font-size: 12px;
-    line-height: 1.6;
+    font-size: 0.9rem;
+    line-height: 1.7;
     color: var(--secondary);
   }
 
   .photo-guide-checklist-title {
     font-weight: 700;
-    margin-bottom: 6px;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
   }
 
   .photo-guide-checklist-title.good {
@@ -652,27 +657,29 @@
   }
 
   .photo-guide-examples {
-    margin-bottom: 16px;
+    margin-bottom: 1.5rem;
   }
 
   .photo-guide-examples-title {
     color: var(--neutral);
     font-weight: 700;
-    margin-bottom: 12px;
-    font-size: 12px;
+    margin-bottom: 1rem;
+    font-size: 0.95rem;
+    letter-spacing: -0.01em;
   }
 
   .photo-guide-examples-grid {
     display: flex;
-    gap: 12px;
+    gap: 1rem;
   }
 
   .photo-guide-example-item {
     flex: 1;
-    border: 1px solid rgba(68, 138, 255, 0.2);
-    border-radius: 8px;
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: 12px;
     overflow: hidden;
-    background: rgba(68, 138, 255, 0.04);
+    background: white;
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08);
   }
 
   .photo-guide-example-img {
@@ -680,16 +687,17 @@
     height: 150px;
     display: block;
     object-fit: contain;
-    padding: 8px;
+    padding: 0.75rem;
+    background: rgba(68, 138, 255, 0.04);
   }
 
   .photo-guide-example-label {
-    padding: 8px;
-    font-size: 10px;
+    padding: 0.75rem;
+    font-size: 0.8rem;
+    font-weight: 600;
     text-align: center;
     color: var(--tertiary);
-    border-top: 1px solid rgba(68, 138, 255, 0.15);
-    background: rgba(105, 240, 174, 0.04);
+    border-top: 1px solid rgba(68, 138, 255, 0.1);
   }
 
   @media (max-width: 52rem) {
@@ -711,28 +719,28 @@
 </div>
 
 <div id="deleteConfirmModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 320px;">
+  <div class="modal-content" style="max-width: 20rem;">
     <div class="modal-title warning">⚠️ 정말 삭제하시겠어요?</div>
     <div id="deleteConfirmName" class="modal-description"></div>
     <div class="modal-actions">
-      <button id="deleteConfirmYes" class="btn-primary" style="padding: 10px;">삭제</button>
-      <button id="deleteConfirmNo" class="btn-ghost" style="padding: 10px;">취소</button>
+      <button id="deleteConfirmYes" class="btn-primary" style="padding: 0.75rem 1rem;">삭제</button>
+      <button id="deleteConfirmNo" class="btn-ghost" style="padding: 0.75rem 1rem;">취소</button>
     </div>
   </div>
 </div>
 
 <div id="generatedProblemModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 320px;">
+  <div class="modal-content" style="max-width: 20rem;">
     <div id="generatedProblemMessage" class="modal-title"></div>
     <div class="modal-actions">
-      <button id="viewProblemsBtn" class="btn-primary" style="padding: 12px;">문제 바로보기</button>
-      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 12px;">저장하기</button>
+      <button id="viewProblemsBtn" class="btn-primary" style="padding: 0.75rem 1rem;">문제 바로보기</button>
+      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 0.75rem 1rem;">저장하기</button>
     </div>
   </div>
 </div>
 
 <div id="photoGuideModal" class="modal-overlay" style="overflow-y: auto;">
-  <div class="modal-content" style="max-width: 900px; margin: 20px auto;">
+  <div class="modal-content" style="max-width: 56rem; margin: 1.25rem auto;">
     <div class="modal-title">사진 인식 가이드</div>
 
     <!-- 두 개의 체크리스트를 가로로 -->
@@ -756,9 +764,9 @@
     </div>
 
     <!-- 팁 섹션 -->
-    <div style="background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 0.85rem;">
-      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 6px;">💡 촬영 팁</div>
-      <div style="display: flex; gap: 16px; flex-wrap: wrap; color: var(--secondary);">
+    <div style="background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
+      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 0.75rem;">💡 촬영 팁</div>
+      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; color: var(--secondary); line-height: 1.6;">
         <div>• 흰색 바닥에 놓고 찍기</div>
         <div>• 밝은 조명 활용</div>
         <div>• 위에서 내려다보며 촬영</div>
@@ -781,7 +789,7 @@
       </div>
     </div>
 
-    <button id="closeGuideBtn" class="btn-primary" style="width: 100%; padding: 12px; font-size: 12px; font-weight: 700; margin-top: 16px;">닫기</button>
+    <button id="closeGuideBtn" class="btn-primary" style="width: 100%; padding: 0.75rem 1rem; margin-top: 1rem;">닫기</button>
   </div>
 </div>
 
