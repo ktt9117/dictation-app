@@ -5,303 +5,365 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-title" content="받아쓰기" />
-<meta name="theme-color" content="#fafafa" />
+<meta name="theme-color" content="#448AFF" />
 <link rel="manifest" href="/manifest.json" />
 <title>받아쓰기 연습</title>
 <style>
-  /* Nintendo Y2K design tokens (see DESIGN.md) */
+  /* Voxel Gamified Isometric Design System */
   :root {
-    --canvas: #7a8aba;
-    --periwinkle: #8ba1d4;
-    --sky: #9fbee7;
-    --lavender: #acace7;
-    --platinum: #dedede;
-    --surface: #ffffff;
-    --chrome-indigo: #3d4f97;
-    --muted-indigo: #60619c;
-    --carbon: #21242e;
-    --ink: #21242e;
-    --ink-soft: #3d4f97;
-    --signal: #f68d1f;
-    --amber: #ecab37;
-    --nav-gold: #e48600;
-    --primary: #e60012;
-    --on-primary: #ffffff;
-    --error: #e60012;
+    --primary: #E8F0FE;
+    --secondary: #5D4037;
+    --tertiary: #69F0AE;
+    --neutral: #448AFF;
+    --surface: #66BB6A;
+    --accent: #FF7043;
 
     --r-none: 0px;
     --r-xs: 2px;
     --r-sm: 4px;
-    --r-md: 6px;
-    --r-lg: 10px;
+    --r-md: 8px;
+    --r-lg: 12px;
     --r-full: 9999px;
 
-    --sans: Arial, Helvetica, -apple-system, system-ui, sans-serif;
-    --mono: "Courier New", monospace;
+    --sans: "Nunito", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --primary: #1a1a2e;
+      --secondary: #e8e8f0;
+    }
+  }
+
+  @keyframes slideUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-4px); }
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+
   * { box-sizing: border-box; }
   [hidden] { display: none !important; }
   .tabs:empty, .grouptitle:empty { display: none; }
+
+  html { color-scheme: light dark; }
+
   body {
     margin: 0 auto;
-    max-width: 830px;
-    padding: 16px 12px 64px;
+    max-width: 1280px;
+    padding: 1.5rem;
+    padding-bottom: 4rem;
     font-family: var(--sans);
-    background: var(--canvas);
-    color: var(--ink);
+    background: var(--primary);
+    color: var(--secondary);
     -webkit-font-smoothing: antialiased;
+    position: relative;
   }
 
-  /* Hero — beveled plate with outlined display wordmark */
+  /* Hero section — floating container with subtle shadow */
   .hero {
     position: relative;
     overflow: hidden;
-    margin-bottom: 16px;
-    padding: 24px 20px 20px;
-    background: var(--periwinkle);
+    margin-bottom: 1.5rem;
+    padding: 2rem 1.5rem;
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.08), rgba(105, 240, 174, 0.08));
     border-radius: var(--r-md);
-    border-top: 2px solid rgba(255, 255, 255, 0.4);
-    border-left: 2px solid rgba(255, 255, 255, 0.3);
-    border-right: 2px solid var(--chrome-indigo);
-    border-bottom: 2px solid var(--chrome-indigo);
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.2), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
-  }
-  .eyebrow {
-    margin: 0 0 8px;
-    font-family: var(--sans);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--ink-soft);
-  }
-  h1 {
-    margin: 0;
-    color: var(--surface);
-    font-weight: 900;
-    line-height: 1;
-    font-size: 32px;
-    letter-spacing: 0;
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.3), -1px -1px 0 rgba(0, 0, 0, 0.2);
-    -webkit-text-stroke: 1.5px var(--ink);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    box-shadow: 0 8px 24px rgba(68, 138, 255, 0.12);
+    animation: slideUp 0.54s ease-out;
   }
 
-  /* Primary CTA = signal orange beveled chip */
+  .eyebrow {
+    margin: 0 0 0.5rem;
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--neutral);
+  }
+
+  h1 {
+    margin: 0;
+    color: var(--secondary);
+    font-weight: 700;
+    line-height: 1.2;
+    font-size: clamp(2rem, 5vw, 2.5rem);
+    letter-spacing: -0.02em;
+    cursor: pointer;
+    transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  h1:hover {
+    transform: scale(1.02);
+  }
+
+  /* Primary CTA button — accent color with lift */
   .pick {
     display: block;
     width: 100%;
-    padding: 14px 16px;
+    padding: 1rem 1.25rem;
     font-family: var(--sans);
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    color: var(--on-primary);
-    background: var(--signal);
+    font-size: 0.95rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    color: white;
+    background: linear-gradient(135deg, var(--neutral), #5eb3ff);
     border: none;
-    border-radius: var(--r-xs);
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
-    border-left: 2px solid rgba(255, 255, 255, 0.2);
-    border-right: 2px solid rgba(0, 0, 0, 0.2);
-    border-bottom: 2px solid rgba(0, 0, 0, 0.3);
+    border-radius: var(--r-md);
     cursor: pointer;
+    box-shadow: 0 4px 12px rgba(68, 138, 255, 0.25);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
-  .pick:disabled { opacity: 0.5; }
+
+  .pick:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(68, 138, 255, 0.35);
+  }
+
+  .pick:active {
+    transform: translateY(0);
+  }
+
+  .pick:disabled { opacity: 0.6; cursor: not-allowed; }
 
   .status {
-    min-height: 20px;
-    padding: 12px 8px;
-    color: var(--ink-soft);
-    font-size: 12px;
+    min-height: 1.25rem;
+    padding: 0.75rem 0.5rem;
+    color: var(--neutral);
+    font-size: 0.9rem;
     font-weight: 500;
   }
+
   .spin {
     display: inline-block;
-    width: 14px;
-    height: 14px;
-    margin-right: 8px;
-    vertical-align: -2px;
-    border: 2px solid rgba(0, 0, 0, 0.1);
-    border-top-color: var(--ink);
+    width: 0.875rem;
+    height: 0.875rem;
+    margin-right: 0.5rem;
+    vertical-align: -0.125rem;
+    border: 2px solid rgba(68, 138, 255, 0.2);
+    border-top-color: var(--neutral);
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* Controls = beveled plate */
+  /* Controls panel — floating card */
   .controls {
     display: grid;
-    gap: 12px;
-    margin: 16px 0;
-    padding: 16px;
-    background: var(--periwinkle);
+    gap: 0.75rem;
+    margin: 1.5rem 0;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.04), rgba(102, 187, 106, 0.04));
     border-radius: var(--r-md);
-    border-top: 2px solid rgba(255, 255, 255, 0.3);
-    border-left: 2px solid rgba(255, 255, 255, 0.2);
-    border-right: 2px solid var(--chrome-indigo);
-    border-bottom: 2px solid var(--chrome-indigo);
-    box-shadow: inset 1px 1px 0 rgba(255, 255, 255, 0.15), inset -1px -1px 0 rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    box-shadow: 0 4px 12px rgba(68, 138, 255, 0.08);
   }
+
   .row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 0.75rem;
   }
+
   .row label {
-    flex: 0 0 80px;
-    color: var(--ink);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    flex: 0 0 auto;
+    min-width: 5.5rem;
+    color: var(--neutral);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
   }
+
   .row input[type=range] {
     flex: 1;
-    accent-color: var(--signal);
+    accent-color: var(--neutral);
   }
+
   .row input[type=checkbox] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--signal);
+    width: 1rem;
+    height: 1rem;
+    accent-color: var(--tertiary);
     cursor: pointer;
   }
+
   .row select {
     flex: 1;
-    padding: 8px 8px;
+    padding: 0.5rem;
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: var(--ink);
-    background: var(--sky);
-    border: 1px solid var(--chrome-indigo);
+    color: var(--secondary);
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.2);
     border-radius: var(--r-xs);
   }
+
   .row .val {
-    flex: 0 0 48px;
+    flex: 0 0 auto;
+    min-width: 3rem;
     text-align: right;
-    font-family: var(--mono);
-    font-size: 11px;
-    color: var(--ink-soft);
-    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--accent);
+    font-weight: 600;
   }
 
-  /* In-app action buttons = carbon slabs */
+  /* Action buttons */
   .actions {
     display: flex;
-    gap: 8px;
+    gap: 0.5rem;
+    flex-wrap: wrap;
   }
+
   .actions button {
     flex: 1;
-    padding: 10px 12px;
+    min-width: 7rem;
+    padding: 0.65rem 1rem;
     font-family: var(--sans);
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    border-radius: var(--r-none);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--r-xs);
     cursor: pointer;
+    transition: all 200ms ease-out;
+    border: 1px solid transparent;
   }
-  .btn-primary {
-    background: var(--carbon);
-    color: var(--on-primary);
-    border: none;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
-  }
-  .btn-ghost {
-    background: var(--sky);
-    color: var(--ink);
-    border: 1px solid var(--chrome-indigo);
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
-  }
-  .actions button:disabled { opacity: 0.5; }
 
-  /* Tabs = category chips */
+  .btn-primary {
+    background: linear-gradient(135deg, var(--accent), #ff8a65);
+    color: white;
+    box-shadow: 0 2px 8px rgba(255, 112, 67, 0.2);
+  }
+
+  .btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255, 112, 67, 0.3);
+  }
+
+  .btn-ghost {
+    background: rgba(68, 138, 255, 0.08);
+    color: var(--neutral);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    box-shadow: none;
+  }
+
+  .btn-ghost:hover {
+    background: rgba(68, 138, 255, 0.12);
+    border-color: rgba(68, 138, 255, 0.3);
+  }
+
+  .actions button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+  /* Tabs — category chips */
   .tabs {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-    margin: 16px 0 8px;
+    gap: 0.5rem;
+    margin: 1.5rem 0 0.5rem;
   }
+
   .tabs button {
-    padding: 8px 14px;
+    padding: 0.5rem 1rem;
     font-family: var(--sans);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
     text-transform: uppercase;
-    color: var(--ink);
-    background: var(--sky);
-    border: 1px solid var(--chrome-indigo);
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--neutral);
+    background: rgba(68, 138, 255, 0.08);
+    border: 1px solid rgba(68, 138, 255, 0.2);
     border-radius: var(--r-xs);
     cursor: pointer;
+    transition: all 200ms ease-out;
   }
+
+  .tabs button:hover {
+    background: rgba(68, 138, 255, 0.12);
+    border-color: rgba(68, 138, 255, 0.3);
+  }
+
   .tabs button.on {
-    background: var(--signal);
-    color: var(--on-primary);
-    border-color: var(--signal);
+    background: var(--neutral);
+    color: white;
+    border-color: var(--neutral);
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.2);
   }
 
   .grouptitle {
-    margin: 8px 0 4px;
-    color: var(--ink);
-    font-size: 13px;
+    margin: 0.5rem 0 0.25rem;
+    color: var(--secondary);
+    font-size: 1rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+    letter-spacing: -0.01em;
   }
 
-  /* Card = beveled plate with platinum row surface */
+  /* Card — floating container with hover lift */
   .card {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin: 8px 0;
-    padding: 12px;
-    background: var(--platinum);
-    border-radius: var(--r-sm);
-    border-top: 1px solid rgba(255, 255, 255, 0.4);
-    border-left: 1px solid rgba(255, 255, 255, 0.3);
-    border-right: 1px solid var(--chrome-indigo);
-    border-bottom: 1px solid var(--chrome-indigo);
+    gap: 0.75rem;
+    margin: 0.5rem 0;
+    padding: 1rem;
+    background: white;
+    border-radius: var(--r-md);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
+
+  .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(68, 138, 255, 0.15);
+    border-color: rgba(68, 138, 255, 0.25);
+  }
+
   .card.active {
-    background: var(--sky);
-    border-color: var(--signal);
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.08), rgba(105, 240, 174, 0.08));
+    border-color: var(--neutral);
+    box-shadow: 0 4px 16px rgba(68, 138, 255, 0.2);
   }
-  /* Number circle */
+
+  /* Number badge */
   .num {
-    flex: 0 0 32px;
-    height: 32px;
+    flex: 0 0 2rem;
+    height: 2rem;
     border-radius: var(--r-full);
-    background: var(--surface);
-    color: var(--ink);
-    border: 1px solid var(--chrome-indigo);
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.12), rgba(105, 240, 174, 0.12));
+    color: var(--neutral);
+    border: 2px solid var(--neutral);
     display: grid;
     place-items: center;
     font-family: var(--sans);
-    font-size: 12px;
+    font-size: 0.8rem;
     font-weight: 700;
   }
+
   .txt {
     flex: 1;
-    color: var(--ink);
-    font-size: 12px;
-    line-height: 1.4;
+    color: var(--secondary);
+    font-size: 0.95rem;
+    line-height: 1.5;
     font-weight: 400;
   }
-  /* Hidden answer = tap to reveal */
+
+  /* Hidden answer — tap to reveal */
   .txt.hidden {
     position: relative;
-    min-height: 32px;
+    min-height: 2rem;
     color: transparent;
     user-select: none;
     cursor: pointer;
-    background: var(--lavender);
-    border: 1px dashed var(--muted-indigo);
+    background: rgba(68, 138, 255, 0.08);
+    border: 1px dashed rgba(68, 138, 255, 0.3);
     border-radius: var(--r-xs);
-    padding: 4px 8px;
+    padding: 0.25rem 0.5rem;
   }
+
   .txt.hidden::after {
     content: "눌러서 정답 확인";
     position: absolute;
@@ -309,68 +371,180 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 6px;
-    color: var(--ink-soft);
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
+    gap: 0.4rem;
+    color: var(--neutral);
+    font-size: 0.75rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
   }
+
   .play {
     flex: 0 0 auto;
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-    color: var(--on-primary);
-    background: var(--signal);
+    width: 2rem;
+    height: 2rem;
+    font-size: 0.9rem;
+    color: white;
+    background: linear-gradient(135deg, var(--accent), #ff8a65);
     border: none;
     border-radius: var(--r-full);
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 600;
+    box-shadow: 0 2px 8px rgba(255, 112, 67, 0.2);
+    transition: all 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
   }
 
-  /* Layout: left sidebar (saved sets) + main column */
+  .play:hover {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(255, 112, 67, 0.3);
+  }
+
+  .play.playing {
+    background: linear-gradient(135deg, var(--tertiary), #7ed321);
+    box-shadow: 0 4px 12px rgba(105, 240, 174, 0.3);
+  }
+
+  #stop { display: none; }
+
+  #playAll.playing {
+    background: linear-gradient(135deg, var(--tertiary), #7ed321);
+    color: white;
+  }
+
+  #backBtn {
+    background: rgba(68, 138, 255, 0.08);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    color: var(--neutral);
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--r-xs);
+    transition: all 200ms ease-out;
+  }
+
+  #backBtn:hover {
+    background: rgba(68, 138, 255, 0.12);
+    border-color: rgba(68, 138, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  #backBtn:active {
+    transform: translateY(0);
+  }
+
+  #installBanner {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, var(--primary), rgba(68, 138, 255, 0.05));
+    border-top: 1px solid rgba(68, 138, 255, 0.2);
+    padding: 1rem 1.5rem;
+    font-family: var(--sans);
+    font-size: 0.95rem;
+    color: var(--secondary);
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 -2px 16px rgba(68, 138, 255, 0.1);
+  }
+
+  #installBanner.show {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    justify-content: space-between;
+  }
+
+  #installBanner button {
+    padding: 0.5rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    background: var(--neutral);
+    color: white;
+    border: none;
+    border-radius: var(--r-xs);
+    cursor: pointer;
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.2);
+    transition: all 200ms ease-out;
+  }
+
+  #installBanner button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(68, 138, 255, 0.3);
+  }
+
+  #installBanner .close {
+    background: transparent;
+    color: var(--secondary);
+    box-shadow: none;
+    padding: 0.25rem 0.5rem;
+    font-size: 1.25rem;
+  }
+
+  #installBanner .close:hover {
+    box-shadow: none;
+  }
+
+  /* Layout */
   .layout {
     display: flex;
-    gap: 16px;
+    gap: 1.5rem;
     align-items: flex-start;
     justify-content: center;
+    position: relative;
+    z-index: 2;
   }
+
   .main {
     width: 100%;
-    max-width: 640px;
+    max-width: 40rem;
     min-width: 0;
   }
+
   .sidebar {
-    flex: 0 0 200px;
+    flex: 0 0 12.5rem;
     position: sticky;
-    top: 16px;
+    top: 1.5rem;
+    z-index: 3;
   }
+
   .sidebar h2 {
-    margin: 0 0 12px;
+    margin: 0 0 0.75rem;
     font-family: var(--sans);
-    font-size: 10px;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.5px;
+    letter-spacing: 0.1em;
     text-transform: uppercase;
-    color: var(--ink);
+    color: var(--neutral);
   }
+
   .sidebar button {
     display: block;
     width: 100%;
-    margin: 6px 0;
-    padding: 10px 12px;
+    margin: 0.375rem 0;
+    padding: 0.625rem 0.75rem;
     text-align: left;
     font-family: var(--sans);
-    font-size: 11px;
+    font-size: 0.8rem;
     font-weight: 500;
-    color: var(--ink);
-    background: var(--sky);
-    border: 1px solid var(--chrome-indigo);
-    border-top: 2px solid rgba(255, 255, 255, 0.2);
+    color: var(--neutral);
+    background: rgba(68, 138, 255, 0.08);
+    border: 1px solid rgba(68, 138, 255, 0.2);
     border-radius: var(--r-sm);
     cursor: pointer;
+    transition: all 200ms ease-out;
   }
-  @media (max-width: 820px) {
+
+  .sidebar button:hover {
+    background: rgba(68, 138, 255, 0.12);
+    border-color: rgba(68, 138, 255, 0.3);
+  }
+
+  @media (max-width: 52rem) {
     .layout {
       flex-direction: column;
       align-items: stretch;
@@ -383,8 +557,101 @@
 </style>
 </head>
 <body>
+<div id="processingBanner" style="display: none; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.1)); border-bottom: 2px solid var(--neutral); padding: 16px; font-family: var(--sans); font-size: 13px; color: var(--neutral); text-align: center; z-index: 999; box-shadow: 0 4px 20px rgba(68, 138, 255, 0.15);">
+  <div style="font-weight: 600; margin-bottom: 4px;">⏳ 글자를 읽고 문제를 분류하는 중입니다</div>
+  <div style="font-size: 12px; opacity: 0.9;">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
+</div>
+
+<div id="deleteConfirmModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 320px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--accent);">⚠️ 정말 삭제하시겠어요?</div>
+    <div id="deleteConfirmName" style="font-size: 12px; margin-bottom: 20px; opacity: 0.8;"></div>
+    <div style="display: flex; gap: 8px;">
+      <button id="deleteConfirmYes" class="btn-primary" style="flex: 1; padding: 10px; font-size: 11px;">삭제</button>
+      <button id="deleteConfirmNo" class="btn-ghost" style="flex: 1; padding: 10px; font-size: 11px;">취소</button>
+    </div>
+  </div>
+</div>
+
+<div id="generatedProblemModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center;">
+  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 320px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15);">
+    <div id="generatedProblemMessage" style="font-size: 14px; font-weight: 700; margin-bottom: 20px; color: var(--neutral); text-align: center;"></div>
+    <div style="display: flex; gap: 8px; flex-direction: column;">
+      <button id="viewProblemsBtn" class="btn-primary" style="padding: 12px; font-size: 12px; font-weight: 700;">문제 바로보기</button>
+      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 12px; font-size: 12px; font-weight: 700;">저장하기</button>
+    </div>
+  </div>
+</div>
+
+<div id="photoGuideModal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 9999; align-items: center; justify-content: center; overflow-y: auto;">
+  <div style="background: white; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 8px; padding: 24px; max-width: 900px; font-family: var(--sans); color: var(--secondary); box-shadow: 0 8px 32px rgba(68, 138, 255, 0.15); margin: 20px auto;">
+    <div style="font-size: 14px; font-weight: 700; margin-bottom: 16px; color: var(--neutral);">사진 인식 가이드</div>
+
+    <!-- 두 개의 체크리스트를 가로로 -->
+    <div style="display: flex; gap: 16px; margin-bottom: 16px;">
+      <div style="flex: 1; font-size: 12px; line-height: 1.6;">
+        <div style="color: #69F0AE; font-weight: 600; margin-bottom: 6px;">✓ 잘 인식되는 사진</div>
+        <div>• 문제지가 바닥과 평행</div>
+        <div>• 네 모서리가 모두 보임</div>
+        <div>• 밝고 균등한 조명</div>
+        <div>• 그림자가 없음</div>
+        <div>• 텍스트가 명확함</div>
+      </div>
+      <div style="flex: 1; font-size: 12px; line-height: 1.6;">
+        <div style="color: #FF7043; font-weight: 600; margin-bottom: 6px;">⚠️ 피해야 할 사진</div>
+        <div>• 비스듬한 각도</div>
+        <div>• 손가락이나 물체가 가림</div>
+        <div>• 어두운 조명 또는 역광</div>
+        <div>• 한쪽만 초점이 맞음</div>
+        <div>• 구겨진 또는 접힌 종이</div>
+      </div>
+    </div>
+
+    <!-- 팁 섹션 -->
+    <div style="background: linear-gradient(135deg, rgba(68, 138, 255, 0.08), rgba(105, 240, 174, 0.08)); border: 1px solid rgba(68, 138, 255, 0.3); border-radius: 8px; padding: 12px; margin-bottom: 16px; font-size: 11px;">
+      <div style="color: #448AFF; font-weight: 600; margin-bottom: 6px;">💡 촬영 팁</div>
+      <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+        <div>• 흰색 바닥에 놓고 찍기</div>
+        <div>• 밝은 조명 활용</div>
+        <div>• 위에서 내려다보며 촬영</div>
+        <div>• 여러 번 찍어 최선 선택</div>
+      </div>
+    </div>
+
+    <!-- 사진 예시를 가로로 -->
+    <div style="margin-bottom: 16px;">
+      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 12px; font-size: 12px;">예시 사진</div>
+      <div style="display: flex; gap: 12px;">
+        <div style="flex: 1; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 4px; overflow: hidden; background: rgba(68, 138, 255, 0.04);">
+          <img src="/assets/dictation-simple-sample.png" style="width: 100%; height: 150px; display: block; object-fit: contain; padding: 8px;" alt="받아쓰기 급수표 예시" />
+          <div style="padding: 8px; font-size: 10px; text-align: center; color: var(--tertiary); border-top: 1px solid rgba(68, 138, 255, 0.1);">급수표 (좋음)</div>
+        </div>
+        <div style="flex: 1; border: 1px solid rgba(68, 138, 255, 0.2); border-radius: 4px; overflow: hidden; background: rgba(68, 138, 255, 0.04);">
+          <img src="/assets/dictation-multi-sample.jpg" style="width: 100%; height: 150px; display: block; object-fit: contain; padding: 8px;" alt="받아쓰기 연습지 예시" />
+          <div style="padding: 8px; font-size: 10px; text-align: center; color: var(--tertiary); border-top: 1px solid rgba(68, 138, 255, 0.1);">연습지 (좋음)</div>
+        </div>
+      </div>
+    </div>
+
+    <button id="closeGuideBtn" class="btn-primary" style="width: 100%; padding: 12px; font-size: 12px; font-weight: 700;">닫기</button>
+  </div>
+</div>
+
+<div id="installBanner">
+  <span id="installMsg"></span>
+  <div style="display: flex; gap: 8px;">
+    <button id="installBtn">설치</button>
+    <button class="close" id="closeBanner">✕</button>
+  </div>
+</div>
+
+<div id="topNav" style="display: none; margin: 0 auto 1.5rem; padding: 1rem 1.5rem; width: 100%; max-width: 40rem; background: white; border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; font-family: var(--sans); font-size: 0.9rem; box-sizing: border-box; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08);">
+  <button id="backBtn">돌아가기</button>
+  <span id="currentSection" style="color: var(--neutral); flex: 1; font-weight: 600;"></span>
+</div>
+
 <div class="layout">
-  <aside class="sidebar" id="savedWrap" hidden>
+  <aside class="sidebar" id="savedWrap" style="display: none;">
     <h2>저장된 세트</h2>
     <div id="saved"></div>
   </aside>
@@ -394,10 +661,49 @@
   <h1>오늘의 받아쓰기</h1>
 </div>
 
-<button class="pick" id="pickBtn">문제지 사진 찍기 / 고르기</button>
-<input type="file" id="file" accept="image/*" capture="environment" hidden />
+<div style="display: flex; gap: 0.5rem;">
+  <button class="pick" id="pickBtn" style="flex: 1;">문제지 사진 찍기 / 고르기</button>
+  <button class="btn-ghost" id="showGuideBtn" style="flex: 0 0 auto; padding: 1rem; font-size: 1.1rem; border-radius: 8px;">?</button>
+</div>
+<input type="file" id="file" accept="image/*" hidden />
 
 <div class="status" id="status"></div>
+
+<div id="gradeSelectUI" style="display: none; margin: 0.5rem 0; padding: 1rem; background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px;">
+  <div style="color: var(--neutral); font-size: 0.9rem; margin-bottom: 0.75rem; font-weight: 600;">학년을 선택하고 저장하세요:</div>
+  <div style="display: flex; gap: 0.5rem;">
+    <select id="gradeForSave" style="flex: 1; padding: 0.5rem; font-family: var(--sans); background: white; border: 1px solid rgba(68, 138, 255, 0.2); color: var(--secondary); border-radius: 4px;">
+      <option value="1학년">1학년</option>
+      <option value="2학년" selected>2학년</option>
+      <option value="3학년">3학년</option>
+      <option value="4학년">4학년</option>
+      <option value="5학년">5학년</option>
+      <option value="6학년">6학년</option>
+    </select>
+    <button id="saveWithGrade" class="btn-primary" style="flex: 0 1 auto;">저장</button>
+  </div>
+</div>
+
+<div style="display: flex; gap: 0.5rem; margin: 0.5rem 0; justify-content: center;">
+  <button id="showRandomBtn" class="btn-ghost" style="flex: 0 1 auto; padding: 0.5rem 1rem; font-size: 0.9rem;">랜덤 생성</button>
+</div>
+
+<div class="controls" id="randomControls" style="display: none; margin-top: 0.5rem;">
+  <div class="row"><label>학년 선택</label>
+    <select id="gradeSelect"></select></div>
+  <div class="row"><label>문제 개수</label>
+    <input type="range" id="randomCount" min="5" max="30" step="5" value="10" />
+    <span class="val" id="countVal">10문제</span></div>
+  <div class="actions">
+    <button class="btn-primary" id="generateRandom">랜덤 생성</button>
+    <button class="btn-ghost" id="closeRandom">취소</button>
+  </div>
+</div>
+
+<div id="homeSection" style="display: none; margin-top: 1.5rem;">
+  <div style="color: var(--neutral); font-size: 0.9rem; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 1rem;">저장된 세트</div>
+  <div id="homeSavedList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+</div>
 
 <div class="controls" id="controls" hidden>
   <div class="row"><label>읽기 속도</label>
@@ -414,8 +720,9 @@
   <div class="row"><label>정답 보기</label>
     <input type="checkbox" id="reveal" /></div>
   <div class="actions">
-    <button class="btn-primary" id="playAll">▶ 이 급수 자동재생</button>
-    <button class="btn-ghost" id="stop">■ 정지</button>
+    <button class="btn-primary" id="playAll">이 급수 자동재생</button>
+    <button class="btn-ghost" id="stop">정지</button>
+    <button class="btn-ghost" id="shuffleBtn">순서섞기</button>
     <button class="btn-ghost" id="save">저장</button>
   </div>
 </div>
@@ -431,7 +738,35 @@ const $ = (id) => document.getElementById(id);
 let groups = [];      // [{title, problems:[{number,text}]}]
 let current = 0;      // selected group index
 let stopped = false;
+let isPlayingAll = false; // 통합 자동재생 중인지 여부 (개별 재생과 구분)
+let isProcessing = false; // OCR 분석 중 여부
 const curProblems = () => (groups[current]?.problems ?? []);
+
+function setProcessingState(processing) {
+  isProcessing = processing;
+  $("processingBanner").style.display = processing ? "block" : "none";
+
+  // 모든 인터랙티브 요소 비활성화
+  const buttons = document.querySelectorAll("button:not(#closeBanner)");
+  const selects = document.querySelectorAll("select");
+  const inputs = document.querySelectorAll("input[type='range'], input[type='checkbox']");
+
+  buttons.forEach((btn) => {
+    btn.disabled = processing;
+    btn.style.opacity = processing ? "0.5" : "1";
+    btn.style.cursor = processing ? "not-allowed" : "pointer";
+  });
+
+  selects.forEach((sel) => {
+    sel.disabled = processing;
+    sel.style.opacity = processing ? "0.5" : "1";
+  });
+
+  inputs.forEach((inp) => {
+    inp.disabled = processing;
+    inp.style.opacity = processing ? "0.5" : "1";
+  });
+}
 
 // ---- TTS (browser-native, offline Korean voice) ----
 let voices = [];
@@ -486,11 +821,109 @@ async function readProblem(text) {
   }
 }
 
-function stop() { stopped = true; speechSynthesis.cancel(); setActive(-1); }
+function stop() {
+  stopped = true;
+  isPlayingAll = false;
+  speechSynthesis.cancel();
+  setActive(-1);
+  updatePlayBtn();
+}
+
+function updateUIVisibility() {
+  // groups가 비어있으면 (홈 화면) pickBtn + 랜덤/목록 표시
+  // groups가 있으면 (세트 선택) 숨김
+  const isHome = groups.length === 0;
+  $("pickBtn").hidden = !isHome;
+  $("showRandomBtn").hidden = !isHome;
+  $("homeSection").hidden = !isHome;
+
+  // 홈화면이면 네비게이션 버튼 숨기기
+  if (isHome) hideNav();
+}
+
+function showNav(title) {
+  const nav = $("topNav");
+  const section = $("currentSection");
+  section.textContent = title || "문제 풀이";
+  nav.style.display = "block";
+}
+
+function hideNav() {
+  $("topNav").style.display = "none";
+}
+
+function showDeleteConfirm(name, idx) {
+  $("deleteConfirmName").textContent = `"${name}"을(를) 정말 삭제하시겠어요?`;
+  const modal = $("deleteConfirmModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+  $("deleteConfirmYes").onclick = () => deleteSet(idx);
+  $("deleteConfirmNo").onclick = () => hideDeleteConfirm();
+}
+
+function hideDeleteConfirm() {
+  $("deleteConfirmModal").style.display = "none";
+}
+
+function deleteSet(idx) {
+  const sets = getSets();
+  sets.splice(idx, 1);
+  localStorage.setItem(KEY, JSON.stringify(sets));
+  hideDeleteConfirm();
+  renderSaved();
+  $("status").innerHTML = `<strong style="color:var(--cyan)">✓ 세트가 삭제되었습니다</strong>`;
+}
+
+function shuffleProblems() {
+  const problems = curProblems();
+  if (problems.length === 0) return;
+
+  // Fisher-Yates 알고리즘으로 무작위 섞기
+  for (let i = problems.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [problems[i], problems[j]] = [problems[j], problems[i]];
+  }
+
+  // 번호 재정렬
+  problems.forEach((p, idx) => {
+    p.number = idx + 1;
+  });
+
+  $("status").innerHTML = `<strong style="color:var(--cyan)">✓ 문제 순서를 섞었습니다</strong>`;
+  render();
+}
+
+function goHome() {
+  stop();
+  groups = [];
+  current = 0;
+  $("list").innerHTML = "";
+  $("tabs").innerHTML = "";
+  $("groupTitle").textContent = "";
+  $("status").textContent = "";
+  $("controls").hidden = true;
+  hideNav();
+  updateUIVisibility();
+}
 
 // ---- rendering ----
 function setActive(idx) {
-  [...$("list").children].forEach((el, i) => el.classList.toggle("active", i === idx));
+  [...$("list").children].forEach((el, i) => {
+    el.classList.toggle("active", i === idx);
+    el.querySelector(".play").classList.toggle("playing", i === idx && !stopped);
+  });
+}
+
+function updatePlayBtn() {
+  const btn = $("playAll");
+  if (isPlayingAll) {
+    btn.classList.add("playing");
+    btn.textContent = "■ 정지";
+  } else {
+    btn.classList.remove("playing");
+    btn.textContent = "▶ 이 급수 자동재생";
+  }
 }
 
 function renderTabs() {
@@ -526,10 +959,13 @@ function render() {
     $("list").appendChild(card);
   });
   $("controls").hidden = groups.length === 0;
+  updateUIVisibility();
 }
 
 async function playAll() {
   stop(); stopped = false;
+  isPlayingAll = true;
+  updatePlayBtn();
   const problems = curProblems();
   const gap = +$("gap").value * 1000;
   for (let i = 0; i < problems.length && !stopped; i++) {
@@ -538,6 +974,40 @@ async function playAll() {
     if (i < problems.length - 1 && !stopped) await wait(gap);
   }
   setActive(-1);
+  isPlayingAll = false;
+  updatePlayBtn();
+}
+
+// ---- 방어 로직: 너무 빈번한 요청 차단 ----
+const MIN_INTERVAL_MS = 2000; // 최소 2초 간격
+const MAX_ATTEMPTS_PER_HOUR = 20; // 1시간에 최대 20회
+let lastRequestTime = 0;
+
+function canMakeRequest() {
+  const now = Date.now();
+  if (now - lastRequestTime < MIN_INTERVAL_MS) {
+    return { allowed: false, message: `너무 빠른 요청입니다. ${Math.ceil((MIN_INTERVAL_MS - (now - lastRequestTime)) / 1000)}초 후 다시 시도하세요.` };
+  }
+
+  // 1시간 내 요청 횟수 체크
+  const hourAgo = now - 3600000;
+  const attempts = JSON.parse(localStorage.getItem("extraction-attempts") || "[]")
+    .filter(t => t > hourAgo);
+
+  if (attempts.length >= MAX_ATTEMPTS_PER_HOUR) {
+    return { allowed: false, message: "시간당 요청 제한에 도달했습니다. 잠시 후 다시 시도하세요." };
+  }
+
+  return { allowed: true };
+}
+
+function recordRequest() {
+  lastRequestTime = Date.now();
+  const attempts = JSON.parse(localStorage.getItem("extraction-attempts") || "[]");
+  const hourAgo = Date.now() - 3600000;
+  const filtered = attempts.filter(t => t > hourAgo);
+  filtered.push(Date.now());
+  localStorage.setItem("extraction-attempts", JSON.stringify(filtered.slice(-MAX_ATTEMPTS_PER_HOUR)));
 }
 
 // ---- image → resized base64 (cuts upload size + vision token cost) ----
@@ -551,6 +1021,21 @@ async function fileToBase64(file, maxEdge = 1600) {
 }
 
 $("pickBtn").onclick = () => $("file").click();
+
+$("showGuideBtn").onclick = () => {
+  $("photoGuideModal").style.display = "flex";
+};
+
+$("closeGuideBtn").onclick = () => {
+  $("photoGuideModal").style.display = "none";
+};
+
+// 모달 외부 클릭으로 닫기
+$("photoGuideModal").onclick = (e) => {
+  if (e.target === $("photoGuideModal")) {
+    $("photoGuideModal").style.display = "none";
+  }
+};
 // ponytail: hash extracted groups to detect duplicates in saved sets.
 function hashGroups(gs) {
   return gs.map(g => g.problems.map(p => p.text).sort().join("•")).sort().join("•");
@@ -559,12 +1044,24 @@ function hashGroups(gs) {
 $("file").onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
+
+  // 방어 로직: 요청 가능 여부 확인
+  const check = canMakeRequest();
+  if (!check.allowed) {
+    $("status").textContent = check.message;
+    e.target.value = "";
+    return;
+  }
+
+  // 처리 시작
+  setProcessingState(true);
+
   $("list").innerHTML = ""; $("tabs").innerHTML = ""; $("groupTitle").textContent = "";
   $("controls").hidden = true;
-  $("pickBtn").disabled = true;
   const started = Date.now();
+  $("status").innerHTML = `<strong style="color:var(--cyan)">${file.name}</strong>`;
   const setBusy = (msg) =>
-    ($("status").innerHTML = `<span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
+    ($("status").innerHTML = `<strong style="color:var(--cyan)">${file.name}</strong><br/><span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
   setBusy("사진을 준비하는 중…");
   const timer = setInterval(() => {
     if ($("status").querySelector(".spin"))
@@ -580,6 +1077,7 @@ $("file").onchange = async (e) => {
     });
     const data = await r.json();
     if (!r.ok) throw new Error(data.error || "인식 실패");
+    recordRequest(); // API 요청 성공 시 기록
     const extracted = data.groups || [];
     const total = extracted.reduce((n, g) => n + g.problems.length, 0);
     if (total === 0) {
@@ -603,13 +1101,18 @@ $("file").onchange = async (e) => {
     groups = extracted;
     current = 0;
     $("status").textContent = `${groups.length}개 급수 · 총 ${total}문제를 찾았어요.`;
+
+    // 학년 선택 UI 표시 (저장 전 학년 결정)
+    $("gradeSelectUI").style.display = "block";
+    showNav("문제 분석 중…");
+
     render();
   } catch (err) {
     $("status").textContent = "오류: " + err.message;
   } finally {
     clearInterval(timer);
-    $("pickBtn").disabled = false;
     e.target.value = ""; // 같은 파일 다시 선택 가능하게
+    setProcessingState(false); // 처리 완료
   }
 };
 
@@ -617,8 +1120,10 @@ $("rate").oninput = () => ($("rateV").textContent = $("rate").value + "x");
 $("rep").oninput = () => ($("repV").textContent = $("rep").value + "회");
 $("gap").oninput = () => ($("gapV").textContent = $("gap").value + "초");
 $("reveal").onchange = render;
-$("playAll").onclick = playAll;
+$("playAll").onclick = () => isPlayingAll ? stop() : playAll();
 $("stop").onclick = stop;
+$("shuffleBtn").onclick = shuffleProblems;
+document.querySelector("h1").onclick = goHome;
 
 // ---- saved sets (localStorage) ----
 const KEY = "dictation-sets";
@@ -627,24 +1132,353 @@ function renderSaved() {
   const sets = getSets();
   $("savedWrap").hidden = sets.length === 0;
   $("saved").innerHTML = "";
-  sets.forEach((s) => {
+  $("homeSavedList").innerHTML = "";
+
+  sets.forEach((s, idx) => {
     const count = s.groups.reduce((n, g) => n + g.problems.length, 0);
+
+    // 홈 화면 버튼 (더 중요한 UI)
+    const homeContainer = document.createElement("div");
+    homeContainer.style.cssText = "display: flex; gap: 8px; align-items: stretch;";
+
+    const homeBtn = document.createElement("button");
+    homeBtn.className = "btn-ghost";
+    homeBtn.style.cssText = "flex: 1; text-align: left; padding: 12px;";
+    homeBtn.innerHTML = `<div style="font-weight: 600;">${s.name}</div><div style="font-size: 11px; opacity: 0.8; margin-top: 4px;">${s.groups.length}급수 · ${count}문제</div>`;
+    homeBtn.onclick = loadSet;
+    homeBtn.dataset.name = s.name;
+    homeBtn.dataset.groups = JSON.stringify(s.groups);
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "btn-ghost";
+    deleteBtn.textContent = "✕";
+    deleteBtn.style.cssText = "flex: 0 0 40px; padding: 12px 8px; font-size: 16px; color: var(--hot-pink);";
+    deleteBtn.onclick = (e) => {
+      e.stopPropagation();
+      showDeleteConfirm(s.name, idx);
+    };
+
+    homeContainer.appendChild(homeBtn);
+    homeContainer.appendChild(deleteBtn);
+    $("homeSavedList").appendChild(homeContainer);
+
+    // 사이드바 버튼 (레거시)
     const b = document.createElement("button");
     b.textContent = `${s.name} (${s.groups.length}급수 · ${count}문제)`;
-    b.onclick = () => { groups = s.groups; current = 0; render(); $("status").textContent = s.name; };
+    b.onclick = loadSet;
+    b.dataset.name = s.name;
+    b.dataset.groups = JSON.stringify(s.groups);
     $("saved").appendChild(b);
   });
+
+  $("homeSection").style.display = sets.length === 0 ? "none" : "block";
 }
+
+function loadSet(e) {
+  const name = e.currentTarget.dataset.name;
+  const groupsData = JSON.parse(e.currentTarget.dataset.groups);
+  groups = groupsData;
+  current = 0;
+  showNav(name);
+  $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
+  render();
+
+  // History API: 뒤로가기 시 홈으로 돌아가기
+  history.pushState({ isDetail: true }, "detail", "#detail");
+}
+$("saveWithGrade").onclick = async () => {
+  if (!groups.length) return;
+  const grade = $("gradeForSave").value;
+  $("saveWithGrade").disabled = true;
+  $("saveWithGrade").textContent = "저장 중…";
+
+  try {
+    // 저장할 데이터 정제 (detectedGrade 제거)
+    const cleanGroups = groups.map((g) => {
+      const { detectedGrade, ...clean } = g;
+      return clean;
+    });
+
+    const r = await fetch("/api/save-problems", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ groups: cleanGroups, grade }),
+    });
+
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+    }
+
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    $("status").innerHTML = `<strong style="color:var(--cyan)">✓ ${grade}에 저장되었습니다</strong>`;
+    $("gradeSelectUI").style.display = "none";
+
+    // 로컬에도 세트 저장 (홈화면 목록에 표시하기 위해)
+    const sets = getSets();
+    sets.unshift({ name: `${grade} · ${new Date().toLocaleDateString("ko-KR")}`, groups: cleanGroups });
+    localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
+    renderSaved();
+
+    // 2초 후 홈화면으로
+    setTimeout(() => {
+      goHome();
+      loadGrades(); // 학년 목록 새로고침
+    }, 1500);
+  } catch (err) {
+    console.error("저장 오류:", err);
+    $("status").textContent = "저장 실패: " + err.message;
+  } finally {
+    $("saveWithGrade").disabled = false;
+    $("saveWithGrade").textContent = "저장";
+  }
+};
+
 $("save").onclick = () => {
   if (!groups.length) return;
-  const name = prompt("세트 이름", new Date().toLocaleDateString("ko-KR"));
+  const name = prompt("로컬 백업 이름", new Date().toLocaleDateString("ko-KR"));
   if (!name) return;
   const sets = getSets();
   sets.unshift({ name, groups });
   localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
   renderSaved();
 };
+document.querySelector("h1").onclick = goHome;
+$("backBtn").onclick = goHome;
+
+// 브라우저 뒤로가기 처리
+window.addEventListener("popstate", (e) => {
+  console.log("[popstate]", e.state);
+  // detail 상태에서 뒤로가기 시 홈으로
+  if (!e.state || !e.state.isDetail) {
+    goHome();
+  }
+});
+
+// 초기 상태를 히스토리에 추가 (뒤로가기 감지용)
+history.replaceState({ isHome: true }, "home", "#");
+
+updateUIVisibility(); // 초기 상태: pickBtn 표시
 renderSaved();
+
+// ---- PWA Install ----
+let deferredPrompt;
+const isIOS = () => /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+const isStandalone = () => window.navigator.standalone === true || window.matchMedia("(display-mode: standalone)").matches;
+
+// 이미 설치된 상태면 배너 완전히 숨김
+if (isStandalone()) {
+  $("installBanner").style.display = "none";
+}
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  if (isStandalone()) return; // 이미 설치됨
+  e.preventDefault();
+  deferredPrompt = e;
+  showInstallPrompt("Android");
+});
+
+function showInstallPrompt(platform) {
+  // 스탠드얼론 모드에서는 배너 표시 안 함
+  if (isStandalone()) return;
+
+  const banner = $("installBanner");
+  const msg = $("installMsg");
+  const btn = $("installBtn");
+
+  if (platform === "Android") {
+    msg.textContent = "받아쓰기 앱을 바탕화면에 추가하세요";
+    btn.textContent = "설치";
+    btn.onclick = async () => {
+      if (deferredPrompt) {
+        deferredPrompt.prompt();
+        const { outcome } = await deferredPrompt.userChoice;
+        if (outcome === "accepted") {
+          banner.classList.remove("show");
+        }
+        deferredPrompt = null;
+      }
+    };
+  } else if (platform === "iOS") {
+    msg.textContent = "Safari의 공유 메뉴에서 '홈 화면에 추가'를 선택하세요";
+    btn.textContent = "안내 보기";
+    btn.onclick = () => alert("Safari 브라우저 하단의 공유 버튼(↑) > 홈 화면에 추가");
+  }
+
+  banner.classList.add("show");
+}
+
+// iOS 사용자에게 설치 안내 (선택적)
+if (isIOS() && !isStandalone() && !localStorage.getItem("pwa-ios-dismissed")) {
+  window.addEventListener("load", () => {
+    setTimeout(() => showInstallPrompt("iOS"), 2000); // 2초 후 안내
+  });
+}
+
+$("closeBanner").onclick = () => {
+  $("installBanner").classList.remove("show");
+  if (isIOS()) localStorage.setItem("pwa-ios-dismissed", "true");
+};
+
+// 서비스 워커 등록 (자동 업데이트 + 오프라인 지원)
+if ("serviceWorker" in navigator) {
+  let swReg;
+  navigator.serviceWorker
+    .register("/sw.js")
+    .then((reg) => {
+      swReg = reg;
+    })
+    .catch(() => {});
+
+  // 백그라운드에서 포그라운드로 올 때 업데이트 확인
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && swReg) {
+      swReg.update().catch(() => {});
+    }
+  });
+}
+
+// ---- 학년별 랜덤 생성 ----
+async function loadGrades() {
+  try {
+    const r = await fetch("/api/grades");
+    if (!r.ok) {
+      $("showRandomBtn").hidden = true;
+      return;
+    }
+    const data = await r.json();
+    const select = $("gradeSelect");
+    select.innerHTML = data.grades
+      .map((g) => `<option value="${g.grade}">${g.grade} (${g.sets}세트, ${g.problems}문제)</option>`)
+      .join("");
+    $("showRandomBtn").hidden = data.grades.length === 0;
+  } catch {
+    $("showRandomBtn").hidden = true;
+  }
+}
+
+$("randomCount").oninput = () => {
+  $("countVal").textContent = $("randomCount").value + "문제";
+};
+
+$("showRandomBtn").onclick = () => {
+  $("randomControls").style.display = $("randomControls").style.display === "none" ? "grid" : "none";
+};
+
+$("closeRandom").onclick = () => {
+  $("randomControls").style.display = "none";
+};
+
+// 생성된 문제 저장 시 사용할 학년 (임시)
+let generatedGrade = null;
+
+function showGeneratedProblemModal(grade, count) {
+  const message = $("generatedProblemMessage");
+  message.textContent = `${grade} ${count}문제가 생성되었습니다.`;
+
+  const modal = $("generatedProblemModal");
+  modal.style.display = "flex";
+  modal.style.alignItems = "center";
+  modal.style.justifyContent = "center";
+
+  // 학년 정보 임시 저장
+  generatedGrade = grade;
+}
+
+function hideGeneratedProblemModal() {
+  $("generatedProblemModal").style.display = "none";
+}
+
+$("viewProblemsBtn").onclick = () => {
+  hideGeneratedProblemModal();
+  if (groups.length > 0) {
+    current = 0;
+    $("status").textContent = `${groups[0].title}`;
+    showNav(groups[0].title);
+    $("randomControls").style.display = "none";
+    render();
+  }
+};
+
+$("saveGeneratedBtn").onclick = async () => {
+  hideGeneratedProblemModal();
+  if (!groups.length) return;
+
+  // 선택한 학년으로 바로 저장
+  const grade = generatedGrade || $("gradeForSave").value;
+  $("saveGeneratedBtn").disabled = true;
+
+  try {
+    // 저장할 데이터 정제
+    const cleanGroups = groups.map((g) => {
+      const { detectedGrade, ...clean } = g;
+      return clean;
+    });
+
+    const r = await fetch("/api/save-problems", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ groups: cleanGroups, grade }),
+    });
+
+    if (!r.ok) {
+      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
+    }
+
+    const data = await r.json();
+    if (data.error) throw new Error(data.error);
+
+    $("status").innerHTML = `<strong style="color:var(--cyan)">✓ ${grade}에 저장되었습니다</strong>`;
+
+    // 로컬에도 세트 저장
+    const sets = getSets();
+    sets.unshift({ name: `${grade} · ${new Date().toLocaleDateString("ko-KR")}`, groups: cleanGroups });
+    localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
+    renderSaved();
+
+    // 2초 후 홈화면으로
+    setTimeout(() => {
+      goHome();
+      loadGrades();
+    }, 1500);
+  } catch (err) {
+    console.error("저장 오류:", err);
+    $("status").textContent = "저장 실패: " + err.message;
+  } finally {
+    $("saveGeneratedBtn").disabled = false;
+  }
+};
+
+$("generateRandom").onclick = async () => {
+  const grade = $("gradeSelect").value;
+  const count = $("randomCount").value;
+  if (!grade) return;
+
+  stop();
+  $("generateRandom").disabled = true;
+  $("status").textContent = "문제를 생성하는 중…";
+
+  try {
+    const r = await fetch(`/api/problems?grade=${encodeURIComponent(grade)}&count=${count}`);
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error);
+
+    groups = data.groups || [];
+    current = 0;
+
+    // 모달 표시
+    showGeneratedProblemModal(grade, count);
+    $("randomControls").style.display = "none";
+  } catch (err) {
+    $("status").textContent = "오류: " + err.message;
+  } finally {
+    $("generateRandom").disabled = false;
+  }
+};
+
+// 페이지 로드 시 학년 목록 조회
+loadGrades();
 </script>
 </body>
 </html>
