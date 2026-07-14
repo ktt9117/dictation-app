@@ -1225,6 +1225,7 @@ function updateUIVisibility() {
   // groups가 있으면 (세트 선택) 숨김
   const isHome = groups.length === 0;
   $("pickBtn").hidden = !isHome;
+  $("showGuideBtn").hidden = !isHome;
   $("showRandomBtn").hidden = !isHome;
   $("homeSection").hidden = !isHome;
 
