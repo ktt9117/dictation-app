@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-title" content="받아쓰기" />
+<link rel="manifest" href="/manifest.json" />
+<title>받아쓰기 연습</title>
+<style>
+  :root { --blue:#3b82f6; --bg:#f7f8fa; --card:#fff; --line:#e5e7eb; --muted:#6b7280; }
+  * { box-sizing: border-box; }
+  body { margin:0; font-family:-apple-system,system-ui,sans-serif; background:var(--bg); color:#111;
+         padding:16px; padding-bottom:40px; max-width:640px; margin:0 auto; }
+  h1 { font-size:20px; margin:8px 0 16px; }
+  button { font-size:16px; padding:10px 14px; border-radius:10px; border:1px solid var(--line);
+           background:#fff; cursor:pointer; }
+  button.primary { background:var(--blue); color:#fff; border-color:var(--blue); }
+  button:disabled { opacity:.5; }
+  .pick { display:block; width:100%; text-align:center; padding:20px; font-size:18px;
+          background:var(--blue); color:#fff; border:none; border-radius:14px; }
+  .controls { background:var(--card); border:1px solid var(--line); border-radius:14px;
+              padding:14px; margin:16px 0; display:grid; gap:12px; }
+  .row { display:flex; align-items:center; gap:10px; }
+  .row label { flex:0 0 64px; color:var(--muted); font-size:14px; }
+  .row input[type=range] { flex:1; }
+  .row .val { flex:0 0 44px; text-align:right; font-variant-numeric:tabular-nums; }
+  .actions { display:flex; gap:10px; }
+  .actions button { flex:1; }
+  .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:14px 0; }
+  .tabs button { padding:8px 12px; font-size:15px; }
+  .tabs button.on { background:var(--blue); color:#fff; border-color:var(--blue); }
+  .grouptitle { font-weight:600; margin:14px 2px 4px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:12px;
+          padding:14px; margin:10px 0; display:flex; align-items:center; gap:12px; }
+  .card.active { border-color:var(--blue); box-shadow:0 0 0 2px rgba(59,130,246,.2); }
+  .num { flex:0 0 34px; height:34px; border-radius:50%; background:var(--blue); color:#fff;
+         display:grid; place-items:center; font-weight:600; }
+  .txt { flex:1; font-size:18px; line-height:1.4; }
+  .txt.hidden { color:transparent; background:#eef0f3; border-radius:6px; user-select:none; }
+  .play { flex:0 0 auto; width:44px; height:44px; border-radius:50%; font-size:18px; }
+  .status { color:var(--muted); padding:8px 2px; }
+  .spin { display:inline-block; width:16px; height:16px; border:2px solid #cbd5e1;
+          border-top-color:var(--blue); border-radius:50%; vertical-align:-3px;
+          margin-right:8px; animation:spin .8s linear infinite; }
+  @keyframes spin { to { transform:rotate(360deg); } }
+  .saved { margin-top:24px; }
+  .saved h2 { font-size:15px; color:var(--muted); }
+  .saved button { display:block; width:100%; text-align:left; margin:6px 0; }
+</style>
+</head>
+<body>
+<h1>받아쓰기 연습 📝</h1>
+
+<button class="pick" id="pickBtn">📷 문제지 사진 찍기 / 고르기</button>
+<input type="file" id="file" accept="image/*" capture="environment" hidden />
+
+<div class="status" id="status"></div>
+
+<div class="controls" id="controls" hidden>
+  <div class="row"><label>읽기 속도</label>
+    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="0.8" />
+    <span class="val" id="rateV">0.8x</span></div>
+  <div class="row"><label>반복 횟수</label>
+    <input type="range" id="rep" min="1" max="3" step="1" value="2" />
+    <span class="val" id="repV">2회</span></div>
+  <div class="row"><label>쓰기 간격</label>
+    <input type="range" id="gap" min="2" max="10" step="1" value="5" />
+    <span class="val" id="gapV">5초</span></div>
+  <div class="row"><label>정답 보기</label>
+    <input type="checkbox" id="reveal" /></div>
+  <div class="actions">
+    <button class="primary" id="playAll">▶ 이 급수 자동재생</button>
+    <button id="stop">■ 정지</button>
+    <button id="save">💾 저장</button>
+  </div>
+</div>
+
+<div class="tabs" id="tabs"></div>
+<div class="grouptitle" id="groupTitle"></div>
+<div id="list"></div>
+
+<div class="saved" id="savedWrap" hidden>
+  <h2>저장된 세트</h2>
+  <div id="saved"></div>
+</div>
+
+<script>
+const $ = (id) => document.getElementById(id);
+let groups = [];      // [{title, problems:[{number,text}]}]
+let current = 0;      // selected group index
+let stopped = false;
+const curProblems = () => (groups[current]?.problems ?? []);
+
+// ---- TTS (browser-native, offline Korean voice) ----
+let voices = [];
+const loadVoices = () => (voices = speechSynthesis.getVoices());
+speechSynthesis.onvoiceschanged = loadVoices;
+loadVoices();
+const koVoice = () => voices.find((v) => v.lang && v.lang.toLowerCase().startsWith("ko"));
+
+function speak(text, rate) {
+  return new Promise((res) => {
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = "ko-KR"; u.rate = rate;
+    const v = koVoice(); if (v) u.voice = v;
+    u.onend = res; u.onerror = res;
+    speechSynthesis.speak(u);
+  });
+}
+const wait = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Read once problem: N repeats with a writing gap between them.
+async function readProblem(text) {
+  const rate = +$("rate").value, reps = +$("rep").value, gap = +$("gap").value * 1000;
+  for (let i = 0; i < reps && !stopped; i++) {
+    await speak(text, rate);
+    if (i < reps - 1 && !stopped) await wait(gap);
+  }
+}
+
+function stop() { stopped = true; speechSynthesis.cancel(); setActive(-1); }
+
+// ---- rendering ----
+function setActive(idx) {
+  [...$("list").children].forEach((el, i) => el.classList.toggle("active", i === idx));
+}
+
+function renderTabs() {
+  $("tabs").innerHTML = "";
+  groups.forEach((g, i) => {
+    const b = document.createElement("button");
+    // label = leading token of the title (e.g. "1급"), else the full title
+    b.textContent = g.title.split(/[·.\s]/)[0] || `${i + 1}`;
+    b.className = i === current ? "on" : "";
+    b.onclick = () => { stop(); current = i; render(); };
+    $("tabs").appendChild(b);
+  });
+}
+
+function render() {
+  const revealed = $("reveal").checked;
+  const problems = curProblems();
+  renderTabs();
+  $("groupTitle").textContent = groups[current]?.title ?? "";
+  $("list").innerHTML = "";
+  problems.forEach((p, i) => {
+    const card = document.createElement("div");
+    card.className = "card";
+    card.innerHTML =
+      `<div class="num">${p.number}</div>` +
+      `<div class="txt ${revealed ? "" : "hidden"}">${p.text}</div>` +
+      `<button class="play">▶</button>`;
+    const txt = card.querySelector(".txt");
+    txt.onclick = () => txt.classList.remove("hidden"); // tap to peek
+    card.querySelector(".play").onclick = async () => {
+      stop(); stopped = false; setActive(i); await readProblem(p.text); setActive(-1);
+    };
+    $("list").appendChild(card);
+  });
+  $("controls").hidden = groups.length === 0;
+}
+
+async function playAll() {
+  stop(); stopped = false;
+  const problems = curProblems();
+  const gap = +$("gap").value * 1000;
+  for (let i = 0; i < problems.length && !stopped; i++) {
+    setActive(i);
+    await readProblem(problems[i].text);
+    if (i < problems.length - 1 && !stopped) await wait(gap);
+  }
+  setActive(-1);
+}
+
+// ---- image → resized base64 (cuts upload size + vision token cost) ----
+async function fileToBase64(file, maxEdge = 1600) {
+  const img = await createImageBitmap(file);
+  const scale = Math.min(1, maxEdge / Math.max(img.width, img.height));
+  const w = Math.round(img.width * scale), h = Math.round(img.height * scale);
+  const c = Object.assign(document.createElement("canvas"), { width: w, height: h });
+  c.getContext("2d").drawImage(img, 0, 0, w, h);
+  return c.toDataURL("image/jpeg", 0.85).split(",")[1];
+}
+
+$("pickBtn").onclick = () => $("file").click();
+$("file").onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  $("list").innerHTML = ""; $("tabs").innerHTML = ""; $("groupTitle").textContent = "";
+  $("controls").hidden = true;
+  $("pickBtn").disabled = true;
+  const started = Date.now();
+  const setBusy = (msg) =>
+    ($("status").innerHTML = `<span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
+  setBusy("사진을 준비하는 중…");
+  const timer = setInterval(() => {
+    if ($("status").querySelector(".spin"))
+      setBusy("글자를 읽고 문제를 분류하는 중… 최대 30초 정도 걸려요");
+  }, 1000);
+  try {
+    const image = await fileToBase64(file);
+    setBusy("글자를 읽고 문제를 분류하는 중… 최대 30초 정도 걸려요");
+    const r = await fetch("/api/extract", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ image, mediaType: "image/jpeg" }),
+    });
+    const data = await r.json();
+    if (!r.ok) throw new Error(data.error || "인식 실패");
+    groups = data.groups || [];
+    current = 0;
+    const total = groups.reduce((n, g) => n + g.problems.length, 0);
+    $("status").textContent = total
+      ? `${groups.length}개 급수 · 총 ${total}문제를 찾았어요.`
+      : "문제를 찾지 못했어요. 다시 찍어 주세요.";
+    render();
+  } catch (err) {
+    $("status").textContent = "오류: " + err.message;
+  } finally {
+    clearInterval(timer);
+    $("pickBtn").disabled = false;
+    e.target.value = ""; // 같은 파일 다시 선택 가능하게
+  }
+};
+
+$("rate").oninput = () => ($("rateV").textContent = $("rate").value + "x");
+$("rep").oninput = () => ($("repV").textContent = $("rep").value + "회");
+$("gap").oninput = () => ($("gapV").textContent = $("gap").value + "초");
+$("reveal").onchange = render;
+$("playAll").onclick = playAll;
+$("stop").onclick = stop;
+
+// ---- saved sets (localStorage) ----
+const KEY = "dictation-sets";
+const getSets = () => JSON.parse(localStorage.getItem(KEY) || "[]");
+function renderSaved() {
+  const sets = getSets();
+  $("savedWrap").hidden = sets.length === 0;
+  $("saved").innerHTML = "";
+  sets.forEach((s) => {
+    const count = s.groups.reduce((n, g) => n + g.problems.length, 0);
+    const b = document.createElement("button");
+    b.textContent = `${s.name} (${s.groups.length}급수 · ${count}문제)`;
+    b.onclick = () => { groups = s.groups; current = 0; render(); $("status").textContent = s.name; };
+    $("saved").appendChild(b);
+  });
+}
+$("save").onclick = () => {
+  if (!groups.length) return;
+  const name = prompt("세트 이름", new Date().toLocaleDateString("ko-KR"));
+  if (!name) return;
+  const sets = getSets();
+  sets.unshift({ name, groups });
+  localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
+  renderSaved();
+};
+renderSaved();
+</script>
+</body>
+</html>

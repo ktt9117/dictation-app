@@ -1,0 +1,10 @@
+{
+  "name": "dictation-app",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node --env-file-if-exists=.env server.js",
+    "selftest": "node server.js --selftest"
+  }
+}
