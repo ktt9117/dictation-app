@@ -34,20 +34,171 @@
       --secondary: #e8e8f0;
     }
 
+    /* Core components */
+    body {
+      background: #161620;
+      color: #e8e8f0;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1));
+      border-color: rgba(68, 138, 255, 0.3);
+    }
+
+    .pick {
+      background: linear-gradient(135deg, #5eb3ff, #4a99ff);
+      color: white;
+    }
+
+    /* Controls & Forms */
+    .controls {
+      background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.05));
+      border-color: rgba(68, 138, 255, 0.25);
+    }
+
+    .row select,
+    #gradeForSave,
+    #gradeSelect {
+      background: #2a2a3e;
+      border-color: rgba(68, 138, 255, 0.2);
+      color: #e8e8f0;
+    }
+
+    .row label {
+      color: #b0b0ff;
+    }
+
+    .row .val {
+      color: #ff9070;
+    }
+
+    /* Tabs & Navigation */
+    .tabs button {
+      background: rgba(68, 138, 255, 0.1);
+      border-color: rgba(68, 138, 255, 0.2);
+      color: #b0b0ff;
+    }
+
+    .tabs button.on {
+      background: #448AFF;
+      color: white;
+      border-color: #448AFF;
+    }
+
+    .grouptitle {
+      color: #e8e8f0;
+    }
+
+    /* Cards & Lists */
+    .card {
+      background: #2a2a3e;
+      border-color: rgba(68, 138, 255, 0.2);
+      color: #e8e8f0;
+    }
+
+    .card.active {
+      background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1));
+      border-color: rgba(68, 138, 255, 0.3);
+    }
+
+    .num {
+      background: rgba(68, 138, 255, 0.2);
+      border-color: #448AFF;
+      color: #b0d4ff;
+    }
+
+    .txt {
+      color: #e8e8f0;
+    }
+
+    .txt.hidden {
+      background: rgba(68, 138, 255, 0.1);
+      border-color: rgba(68, 138, 255, 0.25);
+    }
+
+    .txt.hidden::after {
+      color: #b0b0ff;
+    }
+
+    .play {
+      background: linear-gradient(135deg, #ff9070, #ff7550);
+    }
+
+    .play.playing {
+      background: linear-gradient(135deg, #7ed321, #6bc915);
+    }
+
+    /* Buttons */
+    .btn-primary {
+      background: linear-gradient(135deg, #ff9070, #ff7550);
+      color: white;
+      box-shadow: 0 2px 8px rgba(255, 112, 67, 0.3);
+    }
+
+    .btn-ghost {
+      background: rgba(68, 138, 255, 0.1);
+      border-color: rgba(68, 138, 255, 0.25);
+      color: #b0b0ff;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(68, 138, 255, 0.15);
+      border-color: rgba(68, 138, 255, 0.3);
+    }
+
+    #backBtn {
+      background: rgba(68, 138, 255, 0.1);
+      border-color: rgba(68, 138, 255, 0.25);
+      color: #b0b0ff;
+    }
+
+    /* Modals */
+    .modal-overlay {
+      background: rgba(0, 0, 0, 0.6);
+    }
+
     .modal-content {
       background: #2a2a3e;
       border-color: rgba(105, 240, 174, 0.15);
       color: #e8e8f0;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-title {
+      color: #7ec8ff;
+    }
+
+    .modal-title.warning {
+      color: #ff9070;
     }
 
     .modal-description {
       color: #b0b0c0;
     }
 
-    .card {
-      background: #2a2a3e;
+    .modal-actions button {
       border-color: rgba(68, 138, 255, 0.2);
+    }
+
+    /* Photo Guide */
+    .photo-guide-checklist-col {
       color: #e8e8f0;
+    }
+
+    .photo-guide-checklist-title {
+      color: #7ec8ff;
+    }
+
+    .photo-guide-checklist-title.good {
+      color: #7ed321;
+    }
+
+    .photo-guide-checklist-title.bad {
+      color: #ff9070;
+    }
+
+    .photo-guide-examples-title {
+      color: #7ec8ff;
     }
 
     .photo-guide-example-item {
@@ -57,6 +208,44 @@
 
     .photo-guide-example-img {
       background: rgba(68, 138, 255, 0.1);
+    }
+
+    .photo-guide-example-label {
+      background: rgba(105, 240, 174, 0.08);
+      color: #7ed321;
+      border-color: rgba(68, 138, 255, 0.15);
+    }
+
+    /* Sidebar */
+    .sidebar h2 {
+      color: #b0b0ff;
+    }
+
+    .sidebar button {
+      background: rgba(68, 138, 255, 0.1);
+      border-color: rgba(68, 138, 255, 0.2);
+      color: #b0b0ff;
+    }
+
+    .sidebar button:hover {
+      background: rgba(68, 138, 255, 0.15);
+      border-color: rgba(68, 138, 255, 0.3);
+    }
+
+    /* Status & Install Banner */
+    #installBanner {
+      background: linear-gradient(135deg, #2a2a3e, rgba(68, 138, 255, 0.08));
+      border-top-color: rgba(68, 138, 255, 0.25);
+      color: #e8e8f0;
+    }
+
+    #installBanner button {
+      background: #448AFF;
+      box-shadow: 0 2px 8px rgba(68, 138, 255, 0.3);
+    }
+
+    .status {
+      color: #b0b0ff;
     }
   }
 
