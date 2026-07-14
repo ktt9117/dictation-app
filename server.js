@@ -12,12 +12,20 @@ const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
 // IP 기반 요청 제한 (메모리 저장, 서버 재시작 시 초기화)
 const MIN_INTERVAL_MS = 2000; // IP당 최소 2초 간격
 const MAX_REQUESTS_PER_HOUR = 20; // IP당 시간당 최대 20회
+// ponytail: 전역 상한(모든 IP 합산). 클라이언트가 X-Forwarded-For를 위조해 IP별
+// 제한을 우회해도 Gemini 과금 총량은 이걸로 막는다. per-IP 값보다 넉넉하게.
+const MAX_GLOBAL_REQUESTS_PER_HOUR = 300;
 const ipRequestLog = new Map(); // { ip: { lastTime, times: [timestamps] } }
+let globalRequestTimes = [];
 
 function getClientIP(req) {
-  // X-Forwarded-For 헤더 체크 (프록시/로드밸런서 뒤에 있을 경우)
+  // Render/Fly 등은 자체 프록시가 실제 클라이언트 IP를 X-Forwarded-For 맨 끝에 붙인다.
+  // 맨 앞 값은 클라이언트가 직접 위조할 수 있으므로 신뢰하지 않는다.
   const forwarded = req.headers["x-forwarded-for"];
-  if (forwarded) return forwarded.split(",")[0].trim();
+  if (forwarded) {
+    const ips = forwarded.split(",").map((s) => s.trim());
+    return ips[ips.length - 1] || "unknown";
+  }
   return req.socket.remoteAddress || "unknown";
 }
 
@@ -38,7 +46,27 @@ function checkRateLimit(ip) {
     return { allowed: false, reason: "quota_exceeded", resetIn: Math.ceil((Math.max(...recentRequests) + 3600000 - now) / 1000) };
   }
 
+  const recentGlobal = globalRequestTimes.filter((t) => t > oneHourAgo);
+  if (recentGlobal.length >= MAX_GLOBAL_REQUESTS_PER_HOUR) {
+    return { allowed: false, reason: "quota_exceeded", resetIn: Math.ceil((Math.max(...recentGlobal) + 3600000 - now) / 1000) };
+  }
+
   return { allowed: true };
+}
+
+// ponytail: /api/save-problems은 인증이 없어 별도의(더 느슨한) 저장 전용 상한으로
+// 공유 DB 스팸/오염을 막는다. Gemini 호출이 아니라 굳이 2초 간격까진 안 둔다.
+const MAX_SAVE_REQUESTS_PER_HOUR = 30;
+const MAX_PROBLEMS_PER_SAVE = 200;
+const saveRequestLog = new Map(); // { ip: [timestamps] }
+
+function checkSaveRateLimit(ip) {
+  const now = Date.now();
+  const times = (saveRequestLog.get(ip) || []).filter((t) => t > now - 3600000);
+  if (times.length >= MAX_SAVE_REQUESTS_PER_HOUR) return false;
+  times.push(now);
+  saveRequestLog.set(ip, times);
+  return true;
 }
 
 function recordRequest(ip) {
@@ -48,6 +76,8 @@ function recordRequest(ip) {
   record.times = record.times.filter(t => t > now - 3600000); // 1시간 이전 기록 제거
   record.times.push(now);
   ipRequestLog.set(ip, record);
+  globalRequestTimes = globalRequestTimes.filter((t) => t > now - 3600000);
+  globalRequestTimes.push(now);
 }
 
 // 구조화 출력 스키마(제약 디코딩) → 항상 유효한 JSON을 강제해 파싱 오류를 원천 차단.
@@ -86,8 +116,21 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROBLEMS_DB = join(__dirname, "problems-db.json");
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 
+// ponytail: 로컬 개발은 그대로 파일로. 배포 환경(컨테이너 재시작 시 디스크 초기화)에서만
+// Upstash Redis REST API로 전환 — 두 env var가 있을 때만 활성화, 코드 흐름은 그대로 둔다.
+const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
+const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
+const REDIS_DB_KEY = "problems-db";
+
 // 문제 DB 관리
 async function loadProblemsDB() {
+  if (REDIS_URL) {
+    const r = await fetch(`${REDIS_URL}/get/${REDIS_DB_KEY}`, {
+      headers: { authorization: `Bearer ${REDIS_TOKEN}` },
+    });
+    const { result } = await r.json();
+    return result ? JSON.parse(result) : {};
+  }
   if (!existsSync(PROBLEMS_DB)) return {};
   try {
     const data = await readFile(PROBLEMS_DB, "utf8");
@@ -98,6 +141,14 @@ async function loadProblemsDB() {
 }
 
 async function saveProblemsDB(db) {
+  if (REDIS_URL) {
+    await fetch(`${REDIS_URL}/set/${REDIS_DB_KEY}`, {
+      method: "POST",
+      headers: { authorization: `Bearer ${REDIS_TOKEN}` },
+      body: JSON.stringify(db),
+    });
+    return;
+  }
   await writeFile(PROBLEMS_DB, JSON.stringify(db, null, 2), "utf8");
 }
 
@@ -146,21 +197,28 @@ export async function extract(base64, mediaType) {
   if (GEMINI_MODEL.includes("2.5")) generationConfig.thinkingConfig = { thinkingBudget: 0 };
   log(`Gemini 호출 중… (model=${GEMINI_MODEL})`);
   const t0 = Date.now();
-  const r = await fetch(url, {
-    method: "POST",
-    headers: { "content-type": "application/json", "x-goog-api-key": key },
-    body: JSON.stringify({
-      contents: [
-        {
-          parts: [
-            { inline_data: { mime_type: mediaType, data: base64 } },
-            { text: PROMPT },
-          ],
-        },
-      ],
-      generationConfig,
-    }),
-  });
+  let r;
+  try {
+    r = await fetch(url, {
+      method: "POST",
+      headers: { "content-type": "application/json", "x-goog-api-key": key },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              { inline_data: { mime_type: mediaType, data: base64 } },
+              { text: PROMPT },
+            ],
+          },
+        ],
+        generationConfig,
+      }),
+      signal: AbortSignal.timeout(45000), // ponytail: 무한 대기 방지, 45초면 충분
+    });
+  } catch (e) {
+    if (e.name === "TimeoutError") throw new Error("Gemini 응답이 45초 내에 오지 않았습니다. 다시 시도해 주세요.");
+    throw e;
+  }
   const data = await r.json();
   log(`Gemini 응답 ${r.status} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
   if (!r.ok) throw new Error(data?.error?.message || `Gemini ${r.status}`);
@@ -237,6 +295,14 @@ const server = http.createServer(async (req, res) => {
       return;
     }
     if (req.method === "POST" && req.url === "/api/save-problems") {
+      const saveIp = getClientIP(req);
+      if (!checkSaveRateLimit(saveIp)) {
+        log(`⚠️ 저장 요청 제한 초과: ${saveIp}`);
+        res.writeHead(429, { "content-type": "application/json" }).end(
+          JSON.stringify({ error: "저장 요청이 너무 많습니다. 잠시 후 다시 시도하세요." })
+        );
+        return;
+      }
       try {
         const body = await readBody(req);
         const { groups, grade } = JSON.parse(body);
@@ -245,6 +311,14 @@ const server = http.createServer(async (req, res) => {
           log(`⚠️ 저장 요청 실패: groups=${groups}, grade=${grade}`);
           res.writeHead(400, { "content-type": "application/json" }).end(
             JSON.stringify({ error: "groups(배열)와 grade(문자열)가 필요합니다." })
+          );
+          return;
+        }
+
+        const problemCount = groups.reduce((n, g) => n + (Array.isArray(g?.problems) ? g.problems.length : 0), 0);
+        if (problemCount > MAX_PROBLEMS_PER_SAVE) {
+          res.writeHead(400, { "content-type": "application/json" }).end(
+            JSON.stringify({ error: `한 번에 저장 가능한 문제 수(${MAX_PROBLEMS_PER_SAVE})를 초과했습니다.` })
           );
           return;
         }

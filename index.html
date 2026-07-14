@@ -443,7 +443,7 @@
     font-size: 0.85rem;
     font-weight: 600;
     letter-spacing: -0.01em;
-    border-radius: var(--r-xs);
+    border-radius: var(--r-md);
     cursor: pointer;
     transition: all 200ms ease-out;
     border: 1px solid transparent;
@@ -492,7 +492,7 @@
     color: var(--neutral);
     background: rgba(68, 138, 255, 0.08);
     border: 1px solid rgba(68, 138, 255, 0.2);
-    border-radius: var(--r-xs);
+    border-radius: var(--r-md);
     cursor: pointer;
     transition: all 200ms ease-out;
   }
@@ -634,7 +634,7 @@
     font-family: var(--sans);
     font-size: 0.8rem;
     font-weight: 600;
-    border-radius: var(--r-xs);
+    border-radius: var(--r-md);
     transition: all 200ms ease-out;
   }
 
@@ -681,7 +681,7 @@
     background: var(--neutral);
     color: white;
     border: none;
-    border-radius: var(--r-xs);
+    border-radius: var(--r-md);
     cursor: pointer;
     box-shadow: 0 2px 8px rgba(68, 138, 255, 0.2);
     transition: all 200ms ease-out;
@@ -749,7 +749,7 @@
     color: var(--neutral);
     background: rgba(68, 138, 255, 0.08);
     border: 1px solid rgba(68, 138, 255, 0.2);
-    border-radius: var(--r-sm);
+    border-radius: var(--r-md);
     cursor: pointer;
     transition: all 200ms ease-out;
   }
@@ -792,14 +792,14 @@
       box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
     }
 
-    .top-nav {
+    .top-nav-container {
       background: #2a2a3e !important;
       border-color: rgba(68, 138, 255, 0.2) !important;
       color: #e8e8f0 !important;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
     }
 
-    .top-nav #currentSection {
+    .top-nav-section {
       color: #7ec8ff !important;
     }
   }
@@ -945,37 +945,491 @@
       flex: 0 0 auto;
     }
   }
+
+  /* Utility classes for inline styles */
+  .flex-row {
+    display: flex;
+    flex-direction: row;
+  }
+
+  .flex-col {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .flex-1 {
+    flex: 1;
+  }
+
+  .flex-0 {
+    flex: 0 0 auto;
+  }
+
+  .gap-sm {
+    gap: 0.5rem;
+  }
+
+  .gap-md {
+    gap: 0.75rem;
+  }
+
+  .gap-lg {
+    gap: 1rem;
+  }
+
+  .gap-xl {
+    gap: 1.5rem;
+  }
+
+  .gap-xs {
+    gap: 8px;
+  }
+
+  .pad-sm {
+    padding: 0.5rem;
+  }
+
+  .pad-md {
+    padding: 1rem;
+  }
+
+  .pad-lg {
+    padding: 1.5rem;
+  }
+
+  .pad-md-lg {
+    padding: 1rem 1.5rem;
+  }
+
+  .pad-md-sm {
+    padding: 0.75rem 1rem;
+  }
+
+  .my-sm {
+    margin: 0.5rem 0;
+  }
+
+  .mb-sm {
+    margin-bottom: 0.5rem;
+  }
+
+  .mb-md {
+    margin-bottom: 0.75rem;
+  }
+
+  .mb-lg {
+    margin-bottom: 1.5rem;
+  }
+
+  .mt-sm {
+    margin-top: 0.5rem;
+  }
+
+  .mt-md {
+    margin-top: 1rem;
+  }
+
+  .mt-lg {
+    margin-top: 1.5rem;
+  }
+
+  .mx-auto {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .text-center {
+    text-align: center;
+  }
+
+  .text-sm {
+    font-size: 0.9rem;
+  }
+
+  .text-xs {
+    font-size: 0.75rem;
+  }
+
+  .text-xs-12 {
+    font-size: 12px;
+  }
+
+  .text-xs-13 {
+    font-size: 13px;
+  }
+
+  .font-bold {
+    font-weight: 700;
+  }
+
+  .font-600 {
+    font-weight: 600;
+  }
+
+  .font-medium {
+    font-weight: 500;
+  }
+
+  .text-neutral {
+    color: var(--neutral);
+  }
+
+  .text-secondary {
+    color: var(--secondary);
+  }
+
+  .text-tertiary {
+    color: var(--tertiary);
+  }
+
+  .text-accent {
+    color: var(--accent);
+  }
+
+  .rounded-md {
+    border-radius: var(--r-md);
+  }
+
+  .rounded-lg {
+    border-radius: 12px;
+  }
+
+  .rounded-sm {
+    border-radius: var(--r-xs);
+  }
+
+  .rounded-full {
+    border-radius: var(--r-full);
+  }
+
+  .max-w-xs {
+    max-width: 20rem;
+  }
+
+  .max-w-lg {
+    max-width: 56rem;
+  }
+
+  .max-w-full {
+    max-width: 100%;
+  }
+
+  .w-full {
+    width: 100%;
+  }
+
+  .items-center {
+    align-items: center;
+  }
+
+  .items-start {
+    align-items: flex-start;
+  }
+
+  .justify-center {
+    justify-content: center;
+  }
+
+  .justify-between {
+    justify-content: space-between;
+  }
+
+  .flex-wrap {
+    flex-wrap: wrap;
+  }
+
+  .opacity-90 {
+    opacity: 0.9;
+  }
+
+  .line-height-lg {
+    line-height: 1.6;
+  }
+
+  .letter-spacing-normal {
+    letter-spacing: -0.01em;
+  }
+
+  .text-upper {
+    text-transform: uppercase;
+  }
+
+  /* Processing banner */
+  .processing-banner {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.1));
+    border-bottom: 2px solid var(--neutral);
+    padding: 16px;
+    font-family: var(--sans);
+    font-size: 13px;
+    color: var(--neutral);
+    text-align: center;
+    z-index: 999;
+    box-shadow: 0 4px 20px rgba(68, 138, 255, 0.15);
+  }
+
+  .processing-banner-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+
+  .processing-banner-subtitle {
+    font-size: 12px;
+    opacity: 0.9;
+  }
+
+  /* Modal button padding */
+  .btn-md {
+    padding: 0.75rem 1rem;
+  }
+
+  .btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  /* Info/Tip box */
+  .info-box {
+    background: rgba(68, 138, 255, 0.06);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+    font-size: 0.9rem;
+  }
+
+  .info-box-title {
+    color: var(--neutral);
+    font-weight: 700;
+    margin-bottom: 0.75rem;
+  }
+
+  .info-box-content {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    color: var(--secondary);
+    line-height: 1.6;
+  }
+
+  /* Grade select UI */
+  .grade-select-ui {
+    display: none;
+    margin: 0.5rem 0;
+    padding: 1rem;
+    background: rgba(68, 138, 255, 0.06);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: 8px;
+  }
+
+  .grade-select-ui.show {
+    display: block;
+  }
+
+  .grade-select-label {
+    color: var(--neutral);
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+
+  .grade-select-controls {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .grade-select-input {
+    flex: 1;
+    padding: 0.5rem;
+    font-family: var(--sans);
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    color: var(--secondary);
+    border-radius: 4px;
+  }
+
+  .grade-select-btn {
+    flex: 0 1 auto;
+  }
+
+  /* Button row */
+  .button-row {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .button-row-flex {
+    flex: 1;
+  }
+
+  .button-row-auto {
+    flex: 0 0 auto;
+  }
+
+  .button-row-shrink {
+    flex: 0 1 auto;
+  }
+
+  /* Home section */
+  .home-section {
+    display: none;
+    margin-top: 1.5rem;
+  }
+
+  .home-section.show {
+    display: block;
+  }
+
+  .home-section-title {
+    color: var(--neutral);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+    text-transform: uppercase;
+    margin-bottom: 1rem;
+  }
+
+  .home-saved-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  /* Navigation */
+  .top-nav-container {
+    display: none;
+    margin: 0 auto 1.5rem;
+    padding: 1rem 1.5rem;
+    width: 100%;
+    max-width: 40rem;
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: 8px;
+    font-family: var(--sans);
+    font-size: 0.9rem;
+    box-sizing: border-box;
+    align-items: center;
+    gap: 1.5rem;
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08);
+    color: var(--secondary);
+  }
+
+  .top-nav-container.show {
+    display: flex;
+  }
+
+  .top-nav-section {
+    color: var(--neutral);
+    flex: 1;
+    font-weight: 600;
+  }
+
+  /* Sidebar visibility */
+  .sidebar.show {
+    display: block;
+  }
+
+  .sidebar-hidden {
+    display: none;
+  }
+
+  /* Controls visibility */
+  .controls-hidden {
+    display: none;
+  }
+
+  .controls.show {
+    display: grid;
+  }
+
+  /* Modal content sizing */
+  .modal-content-sm {
+    max-width: 20rem;
+  }
+
+  .modal-content-lg {
+    max-width: 56rem;
+    margin: 1.25rem auto;
+  }
+
+  .modal-overlay-scroll {
+    overflow-y: auto;
+  }
+
+  /* Button groups */
+  .button-group {
+    display: flex;
+    gap: 0.5rem;
+  }
+
+  .button-group-lg {
+    display: flex;
+    gap: 0.5rem;
+    margin: 0.5rem 0;
+    justify-content: center;
+  }
+
+  /* Install banner styles */
+  .install-banner-content {
+    display: flex;
+    gap: 8px;
+  }
+
+  /* Toggle visibility */
+  .hidden-toggle {
+    display: none;
+  }
+
+  .visible-toggle {
+    display: block;
+  }
+
+  /* Guide button specific styles */
+  .guide-btn {
+    padding: 1rem;
+    font-size: 1.1rem;
+    border-radius: var(--r-md);
+  }
+
+  /* Random controls spacing */
+  .random-controls {
+    margin-top: 0.5rem;
+  }
 </style>
 </head>
 <body>
-<div id="processingBanner" style="display: none; position: fixed; top: 0; left: 0; right: 0; background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.1)); border-bottom: 2px solid var(--neutral); padding: 16px; font-family: var(--sans); font-size: 13px; color: var(--neutral); text-align: center; z-index: 999; box-shadow: 0 4px 20px rgba(68, 138, 255, 0.15);">
-  <div style="font-weight: 600; margin-bottom: 4px;">⏳ 글자를 읽고 문제를 분류하는 중입니다</div>
-  <div style="font-size: 12px; opacity: 0.9;">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
+<div id="processingBanner" class="processing-banner">
+  <div class="processing-banner-title">⏳ 글자를 읽고 문제를 분류하는 중입니다</div>
+  <div class="processing-banner-subtitle">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
 </div>
 
 <div id="deleteConfirmModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 20rem;">
+  <div class="modal-content modal-content-sm">
     <div class="modal-title warning">⚠️ 정말 삭제하시겠어요?</div>
     <div id="deleteConfirmName" class="modal-description"></div>
     <div class="modal-actions">
-      <button id="deleteConfirmYes" class="btn-primary" style="padding: 0.75rem 1rem;">삭제</button>
-      <button id="deleteConfirmNo" class="btn-ghost" style="padding: 0.75rem 1rem;">취소</button>
+      <button id="deleteConfirmYes" class="btn-primary btn-md">삭제</button>
+      <button id="deleteConfirmNo" class="btn-ghost btn-md">취소</button>
     </div>
   </div>
 </div>
 
 <div id="generatedProblemModal" class="modal-overlay">
-  <div class="modal-content" style="max-width: 20rem;">
+  <div class="modal-content modal-content-sm">
     <div id="generatedProblemMessage" class="modal-title"></div>
     <div class="modal-actions">
-      <button id="viewProblemsBtn" class="btn-primary" style="padding: 0.75rem 1rem;">문제 바로보기</button>
-      <button id="saveGeneratedBtn" class="btn-ghost" style="padding: 0.75rem 1rem;">저장하기</button>
+      <button id="viewProblemsBtn" class="btn-primary btn-md">문제 바로보기</button>
+      <button id="saveGeneratedBtn" class="btn-ghost btn-md">저장하기</button>
     </div>
   </div>
 </div>
 
-<div id="photoGuideModal" class="modal-overlay" style="overflow-y: auto;">
-  <div class="modal-content" style="max-width: 56rem; margin: 1.25rem auto;">
+<div id="photoGuideModal" class="modal-overlay modal-overlay-scroll">
+  <div class="modal-content modal-content-lg">
     <div class="modal-title">사진 인식 가이드</div>
 
     <!-- 두 개의 체크리스트를 가로로 -->
@@ -999,9 +1453,9 @@
     </div>
 
     <!-- 팁 섹션 -->
-    <div style="background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; font-size: 0.9rem;">
-      <div style="color: var(--neutral); font-weight: 700; margin-bottom: 0.75rem;">💡 촬영 팁</div>
-      <div style="display: flex; gap: 1.5rem; flex-wrap: wrap; color: var(--secondary); line-height: 1.6;">
+    <div class="info-box">
+      <div class="info-box-title">💡 촬영 팁</div>
+      <div class="info-box-content">
         <div>• 흰색 바닥에 놓고 찍기</div>
         <div>• 밝은 조명 활용</div>
         <div>• 위에서 내려다보며 촬영</div>
@@ -1024,27 +1478,27 @@
       </div>
     </div>
 
-    <div class="modal-actions" style="margin-top: 1rem;">
-      <button id="closeGuideBtn" class="btn-primary" style="padding: 0.75rem 1rem;">닫기</button>
+    <div class="modal-actions mt-md">
+      <button id="closeGuideBtn" class="btn-primary btn-md">닫기</button>
     </div>
   </div>
 </div>
 
 <div id="installBanner">
   <span id="installMsg"></span>
-  <div style="display: flex; gap: 8px;">
+  <div class="install-banner-content">
     <button id="installBtn">설치</button>
     <button class="close" id="closeBanner">✕</button>
   </div>
 </div>
 
-<div id="topNav" style="display: none; margin: 0 auto 1.5rem; padding: 1rem 1.5rem; width: 100%; max-width: 40rem; background: white; border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px; font-family: var(--sans); font-size: 0.9rem; box-sizing: border-box; display: flex; align-items: center; gap: 1rem; box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08); color: var(--secondary);" class="top-nav">
+<div id="topNav" class="top-nav-container">
   <button id="backBtn">돌아가기</button>
-  <span id="currentSection" style="color: var(--neutral); flex: 1; font-weight: 600;"></span>
+  <span id="currentSection" class="top-nav-section"></span>
 </div>
 
 <div class="layout">
-  <aside class="sidebar" id="savedWrap" style="display: none;">
+  <aside class="sidebar sidebar-hidden" id="savedWrap">
     <h2>저장된 세트</h2>
     <div id="saved"></div>
   </aside>
@@ -1054,18 +1508,18 @@
   <h1>오늘의 받아쓰기</h1>
 </div>
 
-<div style="display: flex; gap: 0.5rem;">
-  <button class="pick" id="pickBtn" style="flex: 1;">문제지 사진 찍기 / 고르기</button>
-  <button class="btn-ghost" id="showGuideBtn" style="flex: 0 0 auto; padding: 1rem; font-size: 1.1rem; border-radius: 8px;">?</button>
+<div class="button-row">
+  <button class="pick" id="pickBtn">문제지 사진 찍기 / 고르기</button>
+  <button class="btn-ghost button-row-auto guide-btn" id="showGuideBtn">?</button>
 </div>
 <input type="file" id="file" accept="image/*" hidden />
 
 <div class="status" id="status"></div>
 
-<div id="gradeSelectUI" style="display: none; margin: 0.5rem 0; padding: 1rem; background: rgba(68, 138, 255, 0.06); border: 1px solid rgba(68, 138, 255, 0.15); border-radius: 8px;">
-  <div style="color: var(--neutral); font-size: 0.9rem; margin-bottom: 0.75rem; font-weight: 600;">학년을 선택하고 저장하세요:</div>
-  <div style="display: flex; gap: 0.5rem;">
-    <select id="gradeForSave" style="flex: 1; padding: 0.5rem; font-family: var(--sans); background: white; border: 1px solid rgba(68, 138, 255, 0.2); color: var(--secondary); border-radius: 4px;">
+<div id="gradeSelectUI" class="grade-select-ui">
+  <div class="grade-select-label">학년을 선택하고 저장하세요:</div>
+  <div class="grade-select-controls">
+    <select id="gradeForSave" class="grade-select-input">
       <option value="1학년">1학년</option>
       <option value="2학년" selected>2학년</option>
       <option value="3학년">3학년</option>
@@ -1073,15 +1527,15 @@
       <option value="5학년">5학년</option>
       <option value="6학년">6학년</option>
     </select>
-    <button id="saveWithGrade" class="btn-primary" style="flex: 0 1 auto;">저장</button>
+    <button id="saveWithGrade" class="btn-primary grade-select-btn">저장</button>
   </div>
 </div>
 
-<div style="display: flex; gap: 0.5rem; margin: 0.5rem 0; justify-content: center;">
-  <button id="showRandomBtn" class="btn-ghost" style="flex: 0 1 auto; padding: 0.5rem 1rem; font-size: 0.9rem;">랜덤 생성</button>
+<div class="button-group-lg">
+  <button id="showRandomBtn" class="btn-ghost button-row-shrink btn-sm">랜덤 생성</button>
 </div>
 
-<div class="controls" id="randomControls" style="display: none; margin-top: 0.5rem;">
+<div class="controls controls-hidden random-controls" id="randomControls">
   <div class="row"><label>학년 선택</label>
     <select id="gradeSelect"></select></div>
   <div class="row"><label>문제 개수</label>
@@ -1093,9 +1547,9 @@
   </div>
 </div>
 
-<div id="homeSection" style="display: none; margin-top: 1.5rem;">
-  <div style="color: var(--neutral); font-size: 0.9rem; font-weight: 700; letter-spacing: -0.01em; text-transform: uppercase; margin-bottom: 1rem;">저장된 세트</div>
-  <div id="homeSavedList" style="display: flex; flex-direction: column; gap: 0.5rem;"></div>
+<div id="homeSection" class="home-section">
+  <div class="home-section-title">저장된 세트</div>
+  <div id="homeSavedList" class="home-saved-list"></div>
 </div>
 
 <div class="controls" id="controls" hidden>
@@ -1266,7 +1720,7 @@ function deleteSet(idx) {
   localStorage.setItem(KEY, JSON.stringify(sets));
   hideDeleteConfirm();
   renderSaved();
-  $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ 세트가 삭제되었습니다</strong>`;
+  $("status").innerHTML = `<strong class="text-tertiary">✓ 세트가 삭제되었습니다</strong>`;
 }
 
 function shuffleProblems() {
@@ -1284,7 +1738,7 @@ function shuffleProblems() {
     p.number = idx + 1;
   });
 
-  $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ 문제 순서를 섞었습니다</strong>`;
+  $("status").innerHTML = `<strong class="text-tertiary">✓ 문제 순서를 섞었습니다</strong>`;
   render();
 }
 
@@ -1341,13 +1795,18 @@ function render() {
   problems.forEach((p, i) => {
     const card = document.createElement("div");
     card.className = "card";
-    card.innerHTML =
-      `<div class="num">${p.number}</div>` +
-      `<div class="txt ${revealed ? "" : "hidden"}">${p.text}</div>` +
-      `<button class="play">▶</button>`;
-    const txt = card.querySelector(".txt");
+    const numDiv = document.createElement("div");
+    numDiv.className = "num";
+    numDiv.textContent = p.number;
+    const txt = document.createElement("div");
+    txt.className = `txt ${revealed ? "" : "hidden"}`;
+    txt.textContent = p.text;
+    const playBtn = document.createElement("button");
+    playBtn.className = "play";
+    playBtn.textContent = "▶";
+    card.append(numDiv, txt, playBtn);
     txt.onclick = () => txt.classList.remove("hidden"); // tap to peek
-    card.querySelector(".play").onclick = async () => {
+    playBtn.onclick = async () => {
       stop(); stopped = false; setActive(i); await readProblem(p.text); setActive(-1);
     };
     $("list").appendChild(card);
@@ -1453,9 +1912,22 @@ $("file").onchange = async (e) => {
   $("list").innerHTML = ""; $("tabs").innerHTML = ""; $("groupTitle").textContent = "";
   $("controls").hidden = true;
   const started = Date.now();
-  $("status").innerHTML = `<strong style="color:var(--secondary)">${file.name}</strong>`;
-  const setBusy = (msg) =>
-    ($("status").innerHTML = `<strong style="color:var(--secondary)">${file.name}</strong><br/><span class="spin"></span>${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
+  const setStatusFile = (msg) => {
+    $("status").innerHTML = "";
+    const strong = document.createElement("strong");
+    strong.className = "text-secondary";
+    strong.textContent = file.name;
+    $("status").appendChild(strong);
+    if (msg) {
+      $("status").append(document.createElement("br"));
+      const spin = document.createElement("span");
+      spin.className = "spin";
+      $("status").appendChild(spin);
+      $("status").append(`${msg} (${Math.round((Date.now() - started) / 1000)}초)`);
+    }
+  };
+  setStatusFile();
+  const setBusy = (msg) => setStatusFile(msg);
   setBusy("사진을 준비하는 중…");
   const timer = setInterval(() => {
     if ($("status").querySelector(".spin"))
@@ -1483,7 +1955,7 @@ $("file").onchange = async (e) => {
     const extractedHash = hashGroups(extracted);
     const existingSet = sets.find(s => hashGroups(s.groups) === extractedHash);
     if (existingSet) {
-      $("status").innerHTML = `<strong style="color:var(--accent)">⚠️ 이미 저장된 세트</strong> — "${existingSet.name}" 세트와 동일한 문제입니다. 불러올까요?<br/>`;
+      $("status").innerHTML = `<strong class="text-accent">⚠️ 이미 저장된 세트</strong> — "${existingSet.name}" 세트와 동일한 문제입니다. 불러올까요?<br/>`;
       const loadBtn = document.createElement("button");
       loadBtn.className = "btn-primary";
       loadBtn.textContent = "✓ 불러오기";
@@ -1611,7 +2083,7 @@ $("saveWithGrade").onclick = async () => {
     const data = await r.json();
     if (data.error) throw new Error(data.error);
 
-    $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ ${grade}에 저장되었습니다</strong>`;
+    $("status").innerHTML = `<strong class="text-tertiary">✓ ${grade}에 저장되었습니다</strong>`;
     $("gradeSelectUI").style.display = "none";
 
     // 로컬에도 세트 저장 (홈화면 목록에 표시하기 위해)
@@ -1828,7 +2300,7 @@ $("saveGeneratedBtn").onclick = async () => {
     const data = await r.json();
     if (data.error) throw new Error(data.error);
 
-    $("status").innerHTML = `<strong style="color:var(--tertiary)">✓ ${grade}에 저장되었습니다</strong>`;
+    $("status").innerHTML = `<strong class="text-tertiary">✓ ${grade}에 저장되었습니다</strong>`;
 
     // 로컬에도 세트 저장
     const sets = getSets();
