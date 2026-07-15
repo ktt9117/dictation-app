@@ -157,6 +157,15 @@ function extractGradeFromTitle(title) {
   return match ? `${match[1]}급` : "기타";
 }
 
+// ponytail: 급수(예: "6급")가 같으면 표기(대괄호/공백/쪽수 등)가 달라도 같은 세트로 보고 건너뜀.
+// 급수를 못 찾은 제목만 원래대로 완전일치 비교.
+function isDuplicateSet(existingSets, title) {
+  const level = extractGradeFromTitle(title);
+  return existingSets.some((item) =>
+    level === "기타" ? item.title === title : extractGradeFromTitle(item.title) === level
+  );
+}
+
 // ponytail: pass-through + shape guard. The vision model does the OCR, grouping
 // (by 급수/단원) and ordering; we only normalize numbering and drop empties.
 // A flat sheet with no groups comes back as a single group — same shape.
@@ -213,10 +222,10 @@ export async function extract(base64, mediaType) {
         ],
         generationConfig,
       }),
-      signal: AbortSignal.timeout(45000), // ponytail: 무한 대기 방지, 45초면 충분
+      signal: AbortSignal.timeout(90000), // ponytail: 무한 대기 방지, 90초면 충분
     });
   } catch (e) {
-    if (e.name === "TimeoutError") throw new Error("Gemini 응답이 45초 내에 오지 않았습니다. 다시 시도해 주세요.");
+    if (e.name === "TimeoutError") throw new Error("Gemini 응답이 90초 내에 오지 않았습니다. 다시 시도해 주세요.");
     throw e;
   }
   const data = await r.json();
@@ -327,16 +336,19 @@ const server = http.createServer(async (req, res) => {
         if (!db[grade]) db[grade] = [];
 
         let added = 0;
+        let skipped = 0;
         groups.forEach((g) => {
-          if (!db[grade].some((item) => item.title === g.title)) {
+          if (!isDuplicateSet(db[grade], g.title)) {
             db[grade].push(g);
             added++;
+          } else {
+            skipped++;
           }
         });
 
         await saveProblemsDB(db);
-        log(`✓ 문제 저장: ${grade} (${added}세트 추가, 총 ${db[grade].length}세트)`);
-        res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ success: true, added }));
+        log(`✓ 문제 저장: ${grade} (${added}세트 추가, ${skipped}세트 중복 제외, 총 ${db[grade].length}세트)`);
+        res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ success: true, added, skipped }));
       } catch (err) {
         log(`❌ 저장 오류: ${err.message}`);
         res.writeHead(400, { "content-type": "application/json" }).end(
@@ -450,6 +462,21 @@ if (process.argv.includes("--selftest")) {
   let threw = false;
   try { normalizeGroups({}); } catch { threw = true; }
   console.assert(threw, "bad shape throws");
+
+  const existing = [{ title: "[6급] 자신의 생각을 표현해요" }];
+  console.assert(
+    isDuplicateSet(existing, "6급 · 자신의 생각을 표현해요 (46~71)"),
+    "same 급수, different wording -> duplicate"
+  );
+  console.assert(
+    !isDuplicateSet(existing, "[7급] 마음을 담아서 말해요"),
+    "different 급수 -> not duplicate"
+  );
+  console.assert(
+    !isDuplicateSet([{ title: "기타 제목" }], "다른 기타 제목"),
+    "no 급수 in either -> falls back to exact title match"
+  );
+
   console.log("selftest ok");
 } else {
   server.listen(PORT, () => console.log(`http://localhost:${PORT}`));

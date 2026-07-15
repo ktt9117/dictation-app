@@ -399,6 +399,7 @@
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    min-width: 0;
   }
 
   .row label {
@@ -413,6 +414,7 @@
 
   .row input[type=range] {
     flex: 1;
+    min-width: 0;
     accent-color: var(--neutral);
   }
 
@@ -425,6 +427,7 @@
 
   .row select {
     flex: 1;
+    min-width: 0;
     padding: 0.5rem;
     font-family: var(--sans);
     font-size: 0.8rem;
@@ -871,6 +874,13 @@
     color: var(--neutral);
   }
 
+  .home-saved-rename {
+    flex: 0 0 40px;
+    padding: 0.75rem 0.5rem;
+    font-size: 16px;
+    color: var(--neutral);
+  }
+
   .home-saved-delete {
     flex: 0 0 40px;
     padding: 0.75rem 0.5rem;
@@ -1177,12 +1187,12 @@
     top: 0;
     left: 0;
     right: 0;
-    background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.1));
+    background: linear-gradient(135deg, rgba(68, 138, 255, 1), rgba(105, 240, 174, 1));
     border-bottom: 2px solid var(--neutral);
     padding: 16px;
     font-family: var(--sans);
     font-size: 13px;
-    color: var(--neutral);
+    color: #fff;
     text-align: center;
     z-index: 999;
     box-shadow: 0 4px 20px rgba(68, 138, 255, 0.15);
@@ -1270,6 +1280,15 @@
 
   .grade-select-btn {
     flex: 0 1 auto;
+    padding: 0.65rem 1rem;
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    border-radius: var(--r-md);
+    cursor: pointer;
+    transition: all 200ms ease-out;
+    border: 1px solid transparent;
   }
 
   /* Button row */
@@ -1434,16 +1453,6 @@
   </div>
 </div>
 
-<div id="generatedProblemModal" class="modal-overlay">
-  <div class="modal-content modal-content-sm">
-    <div id="generatedProblemMessage" class="modal-title"></div>
-    <div class="modal-actions">
-      <button id="viewProblemsBtn" class="btn-primary btn-md">문제 바로보기</button>
-      <button id="saveGeneratedBtn" class="btn-ghost btn-md">저장하기</button>
-    </div>
-  </div>
-</div>
-
 <div id="photoGuideModal" class="modal-overlay modal-overlay-scroll">
   <div class="modal-content modal-content-lg">
     <div class="modal-title">사진 인식 가이드</div>
@@ -1509,7 +1518,7 @@
 </div>
 
 <div id="topNav" class="top-nav-container">
-  <button id="backBtn">돌아가기</button>
+  <button id="backBtn">&lt; 돌아가기</button>
   <span id="currentSection" class="top-nav-section"></span>
 </div>
 
@@ -1519,16 +1528,18 @@
     <div id="saved"></div>
   </aside>
   <main class="main">
-<div class="hero">
+<div class="hero" id="hero">
   <p class="eyebrow">Dictation · 받아쓰기</p>
   <h1>오늘의 받아쓰기</h1>
 </div>
 
 <div class="button-row">
-  <button class="pick" id="pickBtn">문제지 사진 찍기 / 고르기</button>
+  <button class="pick" id="captureBtn">사진 찍기</button>
+  <button class="pick" id="pickBtn">사진 고르기</button>
   <button class="btn-ghost button-row-auto guide-btn" id="showGuideBtn">?</button>
 </div>
 <input type="file" id="file" accept="image/*" hidden />
+<input type="file" id="fileCapture" accept="image/*" capture="environment" hidden />
 
 <div class="status" id="status"></div>
 
@@ -1570,11 +1581,11 @@
 
 <div class="controls" id="controls" hidden>
   <div class="row"><label>읽기 속도</label>
-    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="1" />
-    <span class="val" id="rateV">1x</span></div>
+    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="0.8" />
+    <span class="val" id="rateV">0.8x</span></div>
   <div class="row"><label>반복 횟수</label>
-    <input type="range" id="rep" min="1" max="3" step="1" value="1" />
-    <span class="val" id="repV">1회</span></div>
+    <input type="range" id="rep" min="1" max="3" step="1" value="2" />
+    <span class="val" id="repV">2회</span></div>
   <div class="row"><label>반복 대기</label>
     <input type="range" id="gap" min="2" max="10" step="1" value="5" />
     <span class="val" id="gapV">5초</span></div>
@@ -1699,10 +1710,12 @@ function updateUIVisibility() {
   // groups가 비어있으면 (홈 화면) pickBtn + 랜덤/목록 표시
   // groups가 있으면 (세트 선택) 숨김
   const isHome = groups.length === 0;
+  $("captureBtn").hidden = !isHome;
   $("pickBtn").hidden = !isHome;
   $("showGuideBtn").hidden = !isHome;
   $("showRandomBtn").hidden = !isHome;
   $("homeSection").hidden = !isHome;
+  $("hero").hidden = !isHome;
 
   // 홈화면이면 네비게이션 버튼 숨기기
   if (isHome) hideNav();
@@ -1901,6 +1914,7 @@ async function fileToBase64(file, maxEdge = 1600) {
 }
 
 $("pickBtn").onclick = () => $("file").click();
+$("captureBtn").onclick = () => $("fileCapture").click();
 
 $("showGuideBtn").onclick = () => {
   $("photoGuideModal").style.display = "flex";
@@ -1921,7 +1935,7 @@ function hashGroups(gs) {
   return gs.map(g => g.problems.map(p => p.text).sort().join("•")).sort().join("•");
 }
 
-$("file").onchange = async (e) => {
+const handleFileSelect = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
@@ -1958,11 +1972,11 @@ $("file").onchange = async (e) => {
   setBusy("사진을 준비하는 중…");
   const timer = setInterval(() => {
     if ($("status").querySelector(".spin"))
-      setBusy("글자를 읽고 문제를 분류하는 중… 최대 30초 정도 걸려요");
+      setBusy("글자를 읽고 문제를 분류하는 중… 최대 90초 정도 걸려요");
   }, 1000);
   try {
     const image = await fileToBase64(file);
-    setBusy("글자를 읽고 문제를 분류하는 중… 최대 30초 정도 걸려요");
+    setBusy("글자를 읽고 문제를 분류하는 중… 최대 90초 정도 걸려요");
     const r = await fetch("/api/extract", {
       method: "POST",
       headers: { "content-type": "application/json" },
@@ -1997,7 +2011,7 @@ $("file").onchange = async (e) => {
 
     // 학년 선택 UI 표시 (저장 전 학년 결정)
     $("gradeSelectUI").style.display = "block";
-    showNav("문제 분석 중…");
+    showNav(groups[0]?.title);
 
     render();
   } catch (err) {
@@ -2008,6 +2022,9 @@ $("file").onchange = async (e) => {
     setProcessingState(false); // 처리 완료
   }
 };
+
+$("file").onchange = handleFileSelect;
+$("fileCapture").onchange = handleFileSelect;
 
 $("rate").oninput = () => ($("rateV").textContent = $("rate").value + "x");
 $("rep").oninput = () => ($("repV").textContent = $("rep").value + "회");
@@ -2048,6 +2065,15 @@ function renderSaved() {
     homeBtn.dataset.name = s.name;
     homeBtn.dataset.groups = JSON.stringify(s.groups);
 
+    const renameBtn = document.createElement("button");
+    renameBtn.className = "btn-ghost home-saved-rename";
+    renameBtn.textContent = "✎";
+    renameBtn.title = "이름 변경";
+    renameBtn.onclick = (e) => {
+      e.stopPropagation();
+      renameSet(idx);
+    };
+
     const deleteBtn = document.createElement("button");
     deleteBtn.className = "btn-ghost home-saved-delete";
     deleteBtn.textContent = "✕";
@@ -2057,6 +2083,7 @@ function renderSaved() {
     };
 
     homeContainer.appendChild(homeBtn);
+    homeContainer.appendChild(renameBtn);
     homeContainer.appendChild(deleteBtn);
     $("homeSavedList").appendChild(homeContainer);
 
@@ -2070,6 +2097,15 @@ function renderSaved() {
   });
 
   $("homeSection").style.display = sets.length === 0 ? "none" : "block";
+}
+
+function renameSet(idx) {
+  const sets = getSets();
+  const newName = prompt("새 이름을 입력하세요", sets[idx].name);
+  if (!newName || !newName.trim() || newName.trim() === sets[idx].name) return;
+  sets[idx].name = newName.trim();
+  localStorage.setItem(KEY, JSON.stringify(sets));
+  renderSaved();
 }
 
 function loadSet(e) {
@@ -2110,7 +2146,8 @@ $("saveWithGrade").onclick = async () => {
     const data = await r.json();
     if (data.error) throw new Error(data.error);
 
-    $("status").innerHTML = `<strong class="text-tertiary">✓ ${grade}에 저장되었습니다</strong>`;
+    const total = data.added + data.skipped;
+    $("status").innerHTML = `<strong class="text-tertiary">✓ ${grade}: 총 ${total}건 중 ${data.added}건 추가, ${data.skipped}건 중복</strong>`;
     $("gradeSelectUI").style.display = "none";
 
     // 로컬에도 세트 저장 (홈화면 목록에 표시하기 위해)
@@ -2118,12 +2155,7 @@ $("saveWithGrade").onclick = async () => {
     sets.unshift({ name: `${grade} · ${new Date().toLocaleDateString("ko-KR")}`, groups: cleanGroups });
     localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
     renderSaved();
-
-    // 2초 후 홈화면으로
-    setTimeout(() => {
-      goHome();
-      loadGrades(); // 학년 목록 새로고침
-    }, 1500);
+    loadGrades(); // 학년 목록 새로고침
   } catch (err) {
     console.error("저장 오류:", err);
     $("status").textContent = "저장 실패: " + err.message;
@@ -2250,7 +2282,7 @@ async function loadGrades() {
     select.innerHTML = data.grades
       .map((g) => `<option value="${g.grade}">${g.grade} (${g.sets}세트, ${g.problems}문제)</option>`)
       .join("");
-    $("showRandomBtn").hidden = data.grades.length === 0;
+    $("showRandomBtn").hidden = groups.length > 0 || data.grades.length === 0;
   } catch {
     $("showRandomBtn").hidden = true;
   }
@@ -2266,86 +2298,6 @@ $("showRandomBtn").onclick = () => {
 
 $("closeRandom").onclick = () => {
   $("randomControls").classList.add("controls-hidden");
-};
-
-// 생성된 문제 저장 시 사용할 학년 (임시)
-let generatedGrade = null;
-
-function showGeneratedProblemModal(grade, count) {
-  const message = $("generatedProblemMessage");
-  message.textContent = `${grade} ${count}문제가 생성되었습니다.`;
-
-  const modal = $("generatedProblemModal");
-  modal.style.display = "flex";
-  modal.style.alignItems = "center";
-  modal.style.justifyContent = "center";
-
-  // 학년 정보 임시 저장
-  generatedGrade = grade;
-}
-
-function hideGeneratedProblemModal() {
-  $("generatedProblemModal").style.display = "none";
-}
-
-$("viewProblemsBtn").onclick = () => {
-  hideGeneratedProblemModal();
-  if (groups.length > 0) {
-    current = 0;
-    $("status").textContent = `${groups[0].title}`;
-    showNav(groups[0].title);
-    $("randomControls").classList.add("controls-hidden");
-    render();
-  }
-};
-
-$("saveGeneratedBtn").onclick = async () => {
-  hideGeneratedProblemModal();
-  if (!groups.length) return;
-
-  // 선택한 학년으로 바로 저장
-  const grade = generatedGrade || $("gradeForSave").value;
-  $("saveGeneratedBtn").disabled = true;
-
-  try {
-    // 저장할 데이터 정제
-    const cleanGroups = groups.map((g) => {
-      const { detectedGrade, ...clean } = g;
-      return clean;
-    });
-
-    const r = await fetch("/api/save-problems", {
-      method: "POST",
-      headers: { "content-type": "application/json" },
-      body: JSON.stringify({ groups: cleanGroups, grade }),
-    });
-
-    if (!r.ok) {
-      throw new Error(`HTTP ${r.status}: ${r.statusText}`);
-    }
-
-    const data = await r.json();
-    if (data.error) throw new Error(data.error);
-
-    $("status").innerHTML = `<strong class="text-tertiary">✓ ${grade}에 저장되었습니다</strong>`;
-
-    // 로컬에도 세트 저장
-    const sets = getSets();
-    sets.unshift({ name: `${grade} · ${new Date().toLocaleDateString("ko-KR")}`, groups: cleanGroups });
-    localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
-    renderSaved();
-
-    // 2초 후 홈화면으로
-    setTimeout(() => {
-      goHome();
-      loadGrades();
-    }, 1500);
-  } catch (err) {
-    console.error("저장 오류:", err);
-    $("status").textContent = "저장 실패: " + err.message;
-  } finally {
-    $("saveGeneratedBtn").disabled = false;
-  }
 };
 
 $("generateRandom").onclick = async () => {
@@ -2365,9 +2317,24 @@ $("generateRandom").onclick = async () => {
     groups = data.groups || [];
     current = 0;
 
-    // 모달 표시
-    showGeneratedProblemModal(grade, count);
+    // 저장할 데이터 정제
+    const cleanGroups = groups.map((g) => {
+      const { detectedGrade, ...clean } = g;
+      return clean;
+    });
+
+    // 랜덤 생성 결과는 서버(공용 문제 은행)가 아니라 로컬에만 저장
+    const actualCount = cleanGroups.reduce((n, g) => n + g.problems.length, 0);
+    const sets = getSets();
+    sets.unshift({ name: `${grade} · 랜덤 ${actualCount}문제`, groups: cleanGroups });
+    localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
+    renderSaved();
+
+    // 바로 문제 상세 페이지로 이동
     $("randomControls").classList.add("controls-hidden");
+    showNav(groups[0]?.title);
+    $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
+    render();
   } catch (err) {
     $("status").textContent = "오류: " + err.message;
   } finally {
