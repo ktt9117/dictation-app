@@ -1597,7 +1597,6 @@
     <button class="btn-primary" id="playAll">자동재생</button>
     <button class="btn-ghost" id="stop">정지</button>
     <button class="btn-ghost" id="shuffleBtn">순서섞기</button>
-    <button class="btn-ghost" id="save">저장</button>
   </div>
 </div>
 
@@ -2165,15 +2164,6 @@ $("saveWithGrade").onclick = async () => {
   }
 };
 
-$("save").onclick = () => {
-  if (!groups.length) return;
-  const name = prompt("로컬 백업 이름", new Date().toLocaleDateString("ko-KR"));
-  if (!name) return;
-  const sets = getSets();
-  sets.unshift({ name, groups });
-  localStorage.setItem(KEY, JSON.stringify(sets.slice(0, 20)));
-  renderSaved();
-};
 document.querySelector("h1").onclick = goHome;
 $("backBtn").onclick = goHome;
 
