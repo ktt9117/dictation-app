@@ -286,6 +286,12 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { "content-type": "application/manifest+json" }).end(m);
       return;
     }
+    if (req.method === "GET" && req.url === "/ads.txt") {
+      res.writeHead(200, { "content-type": "text/plain; charset=utf-8" }).end(
+        "google.com, pub-7166460126134807, DIRECT, f08c47fec0942fa0\n"
+      );
+      return;
+    }
     if (req.method === "GET" && (req.url.startsWith("/examples/") || req.url.startsWith("/assets/"))) {
       const filePath = join(__dirname, req.url);
       if (!filePath.startsWith(__dirname)) {
