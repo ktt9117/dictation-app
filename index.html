@@ -386,6 +386,8 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
+    min-width: 0; /* grid item 기본 min-width:auto가 nowrap 요약 텍스트 때문에
+                     커져서 카드 우측으로 넘치던 문제 방지 */
     padding: 0.65rem 0.85rem;
     background: rgba(68, 138, 255, 0.06);
     border: 1px solid rgba(68, 138, 255, 0.15);
