@@ -1409,6 +1409,13 @@
   :root[data-theme="dark"] .adsbygoogle {
     background: #161620 !important;
   }
+
+  /* 실제로 광고가 채워졌을 때는 구글이 별도 origin의 iframe을 넣기 때문에
+     그 내부 흰 배경은 부모 CSS로 손댈 수 없다 — 애드센스가 공식 제공하는
+     data-ad-status="unfilled" 속성으로 미채움 슬롯 자체를 아예 숨긴다. */
+  ins.adsbygoogle[data-ad-status="unfilled"] {
+    display: none !important;
+  }
 </style>
 </head>
 <body>
