@@ -2227,9 +2227,29 @@ $("appShareBtn").onclick = async () => {
   const url = location.origin;
   if (navigator.share) {
     try { await navigator.share({ title, text, url }); } catch { /* 사용자 취소 */ }
-  } else {
-    await navigator.clipboard.writeText(url);
+    return;
+  }
+  // navigator.clipboard는 HTTPS(또는 localhost)가 아니면 아예 없다 — LAN IP로
+  // 접속한 로컬 테스트 환경 등에서는 execCommand로, 그마저 안 되면 prompt로 노출.
+  if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(url);
+      $("status").innerHTML = `<strong class="text-tertiary">✓ 앱 링크를 클립보드에 복사했어요</strong>`;
+      return;
+    } catch { /* 아래 폴백으로 진행 */ }
+  }
+  const ta = document.createElement("textarea");
+  ta.value = url;
+  ta.style.position = "fixed";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  const copied = document.execCommand?.("copy");
+  document.body.removeChild(ta);
+  if (copied) {
     $("status").innerHTML = `<strong class="text-tertiary">✓ 앱 링크를 클립보드에 복사했어요</strong>`;
+  } else {
+    prompt("아래 링크를 복사하세요", url);
   }
 };
 
