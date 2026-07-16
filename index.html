@@ -374,11 +374,56 @@
     display: grid;
     gap: 0.75rem;
     margin: 1rem 0 1.5rem;
-    padding: 1.5rem;
+    padding: 1rem;
     background: linear-gradient(135deg, rgba(68, 138, 255, 0.04), rgba(102, 187, 106, 0.04));
     border-radius: var(--r-md);
     border: 1px solid rgba(68, 138, 255, 0.15);
     box-shadow: 0 4px 12px rgba(68, 138, 255, 0.08);
+  }
+
+  .settings-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.65rem 0.85rem;
+    background: rgba(68, 138, 255, 0.06);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+    border-radius: var(--r-md);
+    color: var(--secondary);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 150ms ease;
+  }
+
+  .settings-toggle:hover {
+    background: rgba(68, 138, 255, 0.1);
+  }
+
+  #settingsSummary {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    min-width: 0;
+  }
+
+  .settings-toggle-chevron {
+    color: var(--neutral);
+    flex: 0 0 auto;
+    margin-left: 0.5rem;
+    transition: transform 200ms ease;
+  }
+
+  .settings-toggle[aria-expanded="true"] .settings-toggle-chevron {
+    transform: rotate(180deg);
+  }
+
+  /* .row들을 감싸는 래퍼라 .controls의 grid gap이 더는 안 먹혀서 여기서 다시 줌 */
+  #settingsBody {
+    display: grid;
+    gap: 0.75rem;
   }
 
   .row {
@@ -479,6 +524,22 @@
 
   .actions button:disabled { opacity: 0.5; cursor: not-allowed; }
 
+  /* 정답 보기 — 재생 설정과 무관해서 액션 버튼 옆에 별도 토글로 배치 */
+  .reveal-toggle {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex: 0 0 auto;
+    padding: 0.65rem 0.75rem;
+    color: var(--secondary);
+    font-family: var(--sans);
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
   /* Tabs — category chips */
   .tabs {
     display: flex;
@@ -528,7 +589,7 @@
     align-items: center;
     gap: 0.75rem;
     margin: 0.5rem 0;
-    padding: 1rem;
+    padding: 0.75rem;
     background: white;
     border-radius: var(--r-md);
     border: 1px solid rgba(68, 138, 255, 0.15);
@@ -546,6 +607,36 @@
     background: linear-gradient(135deg, rgba(68, 138, 255, 0.08), rgba(105, 240, 174, 0.08));
     border-color: var(--neutral);
     box-shadow: 0 4px 16px rgba(68, 138, 255, 0.2);
+  }
+
+  /* 음성 출력 중임을 보여주는 이퀄라이저 막대 — speaking 중에만 보임 */
+  .eq {
+    display: flex;
+    align-items: flex-end;
+    gap: 2px;
+    width: 1rem;
+    height: 1rem;
+    flex: 0 0 auto;
+    opacity: 0;
+    transition: opacity 150ms ease;
+  }
+
+  .card.speaking .eq { opacity: 1; }
+
+  .eq span {
+    width: 3px;
+    background: var(--neutral);
+    border-radius: 2px;
+    animation: eq-bounce 0.9s ease-in-out infinite;
+  }
+
+  .eq span:nth-child(1) { animation-delay: 0s; }
+  .eq span:nth-child(2) { animation-delay: 0.2s; }
+  .eq span:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes eq-bounce {
+    0%, 100% { height: 25%; }
+    50% { height: 100%; }
   }
 
   /* Number badge */
@@ -571,7 +662,7 @@
     font-weight: 400;
   }
 
-  /* Hidden answer — tap to reveal */
+  /* Hidden answer — double-tap to reveal (실수로 안 열리게) */
   .txt.hidden {
     position: relative;
     min-height: 2rem;
@@ -585,7 +676,7 @@
   }
 
   .txt.hidden::after {
-    content: "눌러서 정답 확인";
+    content: "더블탭해서 정답 확인";
     position: absolute;
     inset: 0;
     display: flex;
@@ -1205,6 +1296,12 @@
     font-weight: 600;
   }
 
+  /* .controls는 grid gap으로 이미 자식 간 간격을 주기 때문에, 그 안에서 쓰는
+     라벨은 자체 margin-bottom을 더하면 간격이 두 배로 겹침 — 0으로 상쇄 */
+  .controls > .grade-select-label {
+    margin-bottom: 0;
+  }
+
   .grade-select-controls {
     display: flex;
     gap: 0.5rem;
@@ -1344,10 +1441,8 @@
     gap: 0.5rem;
   }
 
-  .button-group-lg {
-    display: flex;
-    gap: 0.5rem;
-    margin: 0.5rem 0;
+  .home-cta-section {
+    margin: 1.75rem 0;
   }
 
   /* Install banner styles */
@@ -1365,10 +1460,13 @@
     display: block;
   }
 
-  /* Guide button specific styles */
+  /* Guide button specific styles — 세로 패딩/폰트 크기를 .pick과 맞춰서
+     같은 행(button-row)에서 stretch로 인해 .pick 버튼이 더 커지지 않게 함.
+     .btn-ghost는 1px 테두리가 있어 .pick(테두리 없음)보다 2px 더 커지므로
+     세로 패딩에서 1px씩 빼서 상쇄 */
   .guide-btn {
-    padding: 1rem;
-    font-size: 1.1rem;
+    padding: calc(1rem - 1px) 1.25rem;
+    font-size: 0.95rem;
     border-radius: var(--r-md);
   }
 
@@ -1461,6 +1559,19 @@
   </div>
 </div>
 
+<!-- 네이티브 prompt()는 안드로이드에서 팝업 상단에 도메인 주소를 노출시켜서
+     대신 쓰는 인앱 모달 -->
+<div id="renameModal" class="modal-overlay">
+  <div class="modal-content modal-content-sm">
+    <div class="modal-title">이름 변경</div>
+    <input type="text" id="renameInput" class="grade-select-input w-full mb-lg" />
+    <div class="modal-actions">
+      <button id="renameConfirm" class="btn-primary btn-md">저장</button>
+      <button id="renameCancel" class="btn-ghost btn-md">취소</button>
+    </div>
+  </div>
+</div>
+
 <div id="photoGuideModal" class="modal-overlay modal-overlay-scroll">
   <div class="modal-content modal-content-lg">
     <div class="modal-title">사진 인식 가이드</div>
@@ -1532,18 +1643,44 @@
 
 <div class="layout">
   <main class="main">
-<div class="hero" id="hero">
-  <p class="eyebrow">Dictation · 받아쓰기</p>
-  <h1>오늘의 받아쓰기</h1>
-</div>
+<!-- 홈 화면 전용 콘텐츠. 여기 안에 추가하는 요소는 updateUIVisibility()의
+     homeIntro 토글 하나로 자동으로 상세 페이지에서 숨겨진다 — 개별 id를 따로
+     등록할 필요 없음. (버튼/문구를 개별로 숨기다 하나씩 빠뜨리던 문제 방지) -->
+<div id="homeIntro">
+  <div class="hero" id="hero">
+    <p class="eyebrow">Dictation · 받아쓰기</p>
+    <h1>오늘의 받아쓰기</h1>
+  </div>
 
-<div class="button-row">
-  <button class="pick" id="captureBtn">사진 찍기</button>
-  <button class="pick" id="pickBtn">사진 고르기</button>
-  <button class="btn-ghost button-row-auto guide-btn" id="showGuideBtn">?</button>
+  <div class="home-cta-section">
+    <div class="grade-select-label">다른 사람들이 올린 문제로 풀고 싶다면?</div>
+    <div class="button-row">
+      <button class="pick" id="showRandomBtn">학년별 문제 만들기</button>
+    </div>
+    <div class="controls controls-hidden random-controls" id="randomControls">
+      <div class="row"><label>학년 선택</label>
+        <select id="gradeSelect"></select></div>
+      <div class="row"><label>문제 개수</label>
+        <input type="range" id="randomCount" min="5" max="30" step="5" value="10" />
+        <span class="val" id="countVal">10문제</span></div>
+      <div class="actions">
+        <button class="btn-primary" id="generateRandom">문제 랜덤 생성하기</button>
+        <button class="btn-ghost" id="closeRandom">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="home-cta-section">
+    <div class="grade-select-label">학교에서 받은 문제로 풀고 싶다면?</div>
+    <div class="button-row">
+      <button class="pick" id="captureBtn">사진 찍기</button>
+      <button class="pick" id="pickBtn">앨범에서 고르기</button>
+      <button class="btn-ghost button-row-auto guide-btn" id="showGuideBtn">?</button>
+    </div>
+  </div>
+  <input type="file" id="file" accept="image/*" hidden />
+  <input type="file" id="fileCapture" accept="image/*" capture="environment" hidden />
 </div>
-<input type="file" id="file" accept="image/*" hidden />
-<input type="file" id="fileCapture" accept="image/*" capture="environment" hidden />
 
 <div class="status" id="status"></div>
 
@@ -1564,46 +1701,37 @@
   </div>
 </div>
 
-<div class="button-group-lg">
-  <button id="showRandomBtn" class="btn-ghost w-full btn-sm">학년별 문제 만들기</button>
-</div>
-
-<div class="controls controls-hidden random-controls" id="randomControls">
-  <div class="row"><label>학년 선택</label>
-    <select id="gradeSelect"></select></div>
-  <div class="row"><label>문제 개수</label>
-    <input type="range" id="randomCount" min="5" max="30" step="5" value="10" />
-    <span class="val" id="countVal">10문제</span></div>
-  <div class="actions">
-    <button class="btn-primary" id="generateRandom">문제 랜덤 생성하기</button>
-    <button class="btn-ghost" id="closeRandom">취소</button>
-  </div>
-</div>
-
 <div id="homeSection" class="home-section">
   <div class="home-section-title">저장된 세트</div>
   <div id="homeSavedList" class="home-saved-list"></div>
 </div>
 
 <div class="controls" id="controls" hidden>
-  <div class="row"><label>읽기 속도</label>
-    <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="0.8" />
-    <span class="val" id="rateV">0.8x</span></div>
-  <div class="row"><label>반복 횟수</label>
-    <input type="range" id="rep" min="1" max="3" step="1" value="2" />
-    <span class="val" id="repV">2회</span></div>
-  <div class="row"><label>반복 대기</label>
-    <input type="range" id="gap" min="2" max="10" step="1" value="5" />
-    <span class="val" id="gapV">5초</span></div>
-  <div class="row"><label>음성</label>
-    <select id="voice"></select></div>
-  <div id="voiceWarning" class="text-accent text-xs" hidden>⚠️ 이 기기에는 한국어 음성이 없어 소리가 나지 않을 수 있어요. Chrome 등 다른 브라우저를 사용해보세요.</div>
-  <div class="row"><label for="reveal">정답 보기</label>
-    <input type="checkbox" id="reveal" /></div>
+  <div class="grade-select-label">재생 설정</div>
+  <button type="button" id="settingsToggle" class="settings-toggle" aria-expanded="false">
+    <span id="settingsSummary"></span>
+    <span class="settings-toggle-chevron">▾</span>
+  </button>
+  <div id="settingsBody" hidden>
+    <div class="row"><label>읽기 속도</label>
+      <input type="range" id="rate" min="0.5" max="1.2" step="0.1" value="0.8" />
+      <span class="val" id="rateV">0.8x</span></div>
+    <div class="row"><label>반복 횟수</label>
+      <input type="range" id="rep" min="1" max="3" step="1" value="2" />
+      <span class="val" id="repV">2회</span></div>
+    <div class="row"><label>반복 대기</label>
+      <input type="range" id="gap" min="2" max="10" step="1" value="5" />
+      <span class="val" id="gapV">5초</span></div>
+    <div class="row"><label>음성</label>
+      <select id="voice"></select></div>
+    <div id="voiceWarning" class="text-accent text-xs" hidden>⚠️ 이 기기에는 한국어 음성이 없어 소리가 나지 않을 수 있어요. Chrome 등 다른 브라우저를 사용해보세요.</div>
+  </div>
   <div class="actions">
     <button class="btn-primary" id="playAll">자동재생</button>
     <button class="btn-ghost" id="stop">정지</button>
     <button class="btn-ghost" id="shuffleBtn">순서섞기</button>
+    <label class="reveal-toggle" for="reveal">정답 보기
+      <input type="checkbox" id="reveal" /></label>
   </div>
 </div>
 
@@ -1661,6 +1789,33 @@ function setProcessingState(processing) {
   });
 }
 
+// ---- 재생 설정 영속화 (읽기 속도/반복/대기/음성 — 정답 보기는 세션 한정, 영속화 안 함) ----
+const PLAYBACK_SETTINGS_KEY = "dictation-playback-settings";
+const loadPlaybackSettings = () => JSON.parse(localStorage.getItem(PLAYBACK_SETTINGS_KEY) || "{}");
+function savePlaybackSettings() {
+  localStorage.setItem(PLAYBACK_SETTINGS_KEY, JSON.stringify({
+    rate: $("rate").value,
+    rep: $("rep").value,
+    gap: $("gap").value,
+    voice: $("voice").value,
+  }));
+}
+function applyPlaybackSettings() {
+  const s = loadPlaybackSettings();
+  if (s.rate) { $("rate").value = s.rate; $("rateV").textContent = s.rate + "x"; }
+  if (s.rep) { $("rep").value = s.rep; $("repV").textContent = s.rep + "회"; }
+  if (s.gap) { $("gap").value = s.gap; $("gapV").textContent = s.gap + "초"; }
+  // 음성은 목록이 비동기로 로드되므로 fillVoiceMenu()에서 적용
+}
+function updateSettingsSummary() {
+  const voiceName = $("voice").selectedOptions[0]?.textContent;
+  const parts = [`${$("rate").value}배속`, `${$("rep").value}회`, `${$("gap").value}초 대기`];
+  if (voiceName) parts.push(voiceName);
+  $("settingsSummary").textContent = parts.join(" · ");
+}
+applyPlaybackSettings();
+updateSettingsSummary();
+
 // ---- TTS (browser-native, offline Korean voice) ----
 let voices = [];
 // Rank Korean voices by quality. The low-quality "compact"/novelty voices are
@@ -1683,14 +1838,16 @@ const loadVoices = () => { voices = speechSynthesis.getVoices(); fillVoiceMenu()
 speechSynthesis.onvoiceschanged = loadVoices;
 loadVoices();
 
-// Populate the dropdown; default to the best-scored voice (unless user already chose).
+// Populate the dropdown; default to the saved/best-scored voice (unless user already chose).
 function fillVoiceMenu() {
   const sel = $("voice"), ko = koVoices();
   $("voiceWarning").hidden = ko.length > 0;
   if (!ko.length) return;
-  const chosen = sel.value;
+  const saved = loadPlaybackSettings().voice;
+  const chosen = ko.some((v) => v.name === saved) ? saved : sel.value;
   sel.innerHTML = ko.map((v) => `<option value="${v.name}">${v.name}</option>`).join("");
   sel.value = ko.some((v) => v.name === chosen) ? chosen : ko[0].name; // ko[0] = best pick
+  updateSettingsSummary();
 }
 
 // Chrome은 아무도 강한 참조를 들고 있지 않으면 재생 중인 utterance를 GC해버려
@@ -1713,6 +1870,7 @@ function speak(text, rate) {
       if (done) return;
       done = true;
       currentUtterance = null;
+      document.querySelector(".card.speaking")?.classList.remove("speaking");
       res();
     };
     u.onend = finish;
@@ -1720,6 +1878,8 @@ function speak(text, rate) {
     try {
       speechSynthesis.cancel();
       speechSynthesis.speak(u);
+      // onstart는 iOS Safari에서 거의 안 붙어서(위 주석 참고) 호출 시점에 바로 켬
+      document.querySelector(".card.active")?.classList.add("speaking");
     } catch {
       finish();
       return;
@@ -1729,11 +1889,21 @@ function speak(text, rate) {
 }
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
 
+// 자동재생 대기 중엔 활성 카드의 ▶ 버튼에 남은 초를 표시 (재생대기 시간 안내)
+async function waitCountdown(ms, myGen) {
+  const btn = document.querySelector(".play.playing");
+  for (let remain = ms; remain > 0 && myGen === playGen; remain -= 1000) {
+    if (btn) btn.textContent = String(Math.ceil(remain / 1000));
+    await wait(Math.min(1000, remain));
+  }
+  if (btn && myGen === playGen) btn.textContent = "▶";
+}
+
 // Read once problem: N repeats with a writing gap between them.
 async function readProblem(text, rate, reps, gap, myGen) {
   for (let i = 0; i < reps && myGen === playGen; i++) {
     await speak(text, rate);
-    if (i < reps - 1 && myGen === playGen) await wait(gap);
+    if (i < reps - 1 && myGen === playGen) await waitCountdown(gap, myGen);
   }
 }
 
@@ -1746,15 +1916,11 @@ function stop() {
 }
 
 function updateUIVisibility() {
-  // groups가 비어있으면 (홈 화면) pickBtn + 랜덤/목록 표시
+  // groups가 비어있으면 (홈 화면) homeIntro(히어로+버튼들) + 저장된 세트 목록 표시
   // groups가 있으면 (세트 선택) 숨김
   const isHome = groups.length === 0;
-  $("captureBtn").hidden = !isHome;
-  $("pickBtn").hidden = !isHome;
-  $("showGuideBtn").hidden = !isHome;
-  $("showRandomBtn").hidden = !isHome;
+  $("homeIntro").hidden = !isHome;
   $("homeSection").hidden = !isHome;
-  $("hero").hidden = !isHome;
 
   // 홈화면이면 네비게이션 버튼 숨기기
   if (isHome) hideNav();
@@ -1840,7 +2006,10 @@ function goHome() {
 function setActive(idx) {
   [...$("list").children].forEach((el, i) => {
     el.classList.toggle("active", i === idx);
-    el.querySelector(".play").classList.toggle("playing", i === idx);
+    el.classList.remove("speaking"); // 카드 전환 시 이전 카드의 이퀄라이저 애니메이션 정지
+    const btn = el.querySelector(".play");
+    btn.classList.toggle("playing", i === idx);
+    btn.textContent = "▶"; // 대기 카운트다운 표시를 새 활성 카드로 넘어갈 때 초기화
     if (i === idx) el.scrollIntoView({ block: "center", behavior: "smooth" });
   });
 }
@@ -1884,11 +2053,14 @@ function render() {
     const txt = document.createElement("div");
     txt.className = `txt ${revealed ? "" : "hidden"}`;
     txt.textContent = p.text;
+    const eq = document.createElement("div");
+    eq.className = "eq";
+    eq.innerHTML = "<span></span><span></span><span></span>";
     const playBtn = document.createElement("button");
     playBtn.className = "play";
     playBtn.textContent = "▶";
-    card.append(numDiv, txt, playBtn);
-    txt.onclick = () => txt.classList.remove("hidden"); // tap to peek
+    card.append(numDiv, txt, eq, playBtn);
+    txt.ondblclick = () => txt.classList.remove("hidden"); // 실수로 안 열리게 더블탭으로만 확인
     playBtn.onclick = async () => {
       // 개별 재생은 자동재생 설정(속도/반복)과 무관하게 항상 0.8배속 1회 고정.
       stop(); // 자동재생 중이었다면 멈춤
@@ -1914,7 +2086,7 @@ async function playAll() {
     for (let i = 0; i < problems.length && myGen === playGen; i++) {
       setActive(i);
       await readProblem(problems[i].text, rate, reps, gap, myGen);
-      if (i < problems.length - 1 && myGen === playGen) await wait(gap);
+      if (i < problems.length - 1 && myGen === playGen) await waitCountdown(gap, myGen);
     }
   } catch (err) {
     console.error("자동재생 오류:", err);
@@ -2083,10 +2255,17 @@ const handleFileSelect = async (e) => {
 $("file").onchange = handleFileSelect;
 $("fileCapture").onchange = handleFileSelect;
 
-$("rate").oninput = () => ($("rateV").textContent = $("rate").value + "x");
-$("rep").oninput = () => ($("repV").textContent = $("rep").value + "회");
-$("gap").oninput = () => ($("gapV").textContent = $("gap").value + "초");
+const onSettingChange = () => { savePlaybackSettings(); updateSettingsSummary(); };
+$("rate").oninput = () => { $("rateV").textContent = $("rate").value + "x"; onSettingChange(); };
+$("rep").oninput = () => { $("repV").textContent = $("rep").value + "회"; onSettingChange(); };
+$("gap").oninput = () => { $("gapV").textContent = $("gap").value + "초"; onSettingChange(); };
 $("reveal").onchange = render;
+$("voice").onchange = onSettingChange;
+$("settingsToggle").onclick = () => {
+  const expanded = $("settingsToggle").getAttribute("aria-expanded") === "true";
+  $("settingsToggle").setAttribute("aria-expanded", String(!expanded));
+  $("settingsBody").hidden = expanded;
+};
 $("playAll").onclick = () => isPlayingAll ? stop() : playAll();
 $("stop").onclick = stop;
 $("shuffleBtn").onclick = shuffleProblems;
@@ -2126,7 +2305,7 @@ function renderSaved() {
     renameBtn.title = "이름 변경";
     renameBtn.onclick = (e) => {
       e.stopPropagation();
-      renameSet(idx);
+      showRenameModal(idx);
     };
 
     const deleteBtn = document.createElement("button");
@@ -2146,14 +2325,34 @@ function renderSaved() {
   $("homeSection").style.display = sets.length === 0 ? "none" : "block";
 }
 
-function renameSet(idx) {
+function showRenameModal(idx) {
   const sets = getSets();
-  const newName = prompt("새 이름을 입력하세요", sets[idx].name);
-  if (!newName || !newName.trim() || newName.trim() === sets[idx].name) return;
-  sets[idx].name = newName.trim();
-  localStorage.setItem(KEY, JSON.stringify(sets));
-  renderSaved();
+  const input = $("renameInput");
+  input.value = sets[idx].name;
+  $("renameModal").style.display = "flex";
+  input.focus();
+  input.select();
+
+  const commit = () => {
+    const newName = input.value.trim();
+    if (newName && newName !== sets[idx].name) {
+      sets[idx].name = newName;
+      localStorage.setItem(KEY, JSON.stringify(sets));
+      renderSaved();
+    }
+    hideRenameModal();
+  };
+  $("renameConfirm").onclick = commit;
+  input.onkeydown = (e) => {
+    if (e.key === "Enter") commit();
+    if (e.key === "Escape") hideRenameModal();
+  };
 }
+
+function hideRenameModal() {
+  $("renameModal").style.display = "none";
+}
+$("renameCancel").onclick = hideRenameModal;
 
 function loadSet(e) {
   const name = e.currentTarget.dataset.name;
