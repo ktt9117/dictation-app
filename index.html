@@ -164,7 +164,8 @@
     border-color: rgba(68, 138, 255, 0.3) !important;
   }
 
-  :root[data-theme="dark"] #backBtn {
+  :root[data-theme="dark"] #backBtn,
+  :root[data-theme="dark"] #shareBtn {
     background: rgba(68, 138, 255, 0.1) !important;
     border-color: rgba(68, 138, 255, 0.25) !important;
     color: #b0b0ff !important;
@@ -651,6 +652,29 @@
   }
 
   #backBtn:active {
+    transform: translateY(0);
+  }
+
+  #shareBtn {
+    background: rgba(68, 138, 255, 0.08);
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    color: var(--neutral);
+    cursor: pointer;
+    padding: 0.5rem 0.75rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    font-weight: 600;
+    border-radius: var(--r-md);
+    transition: all 200ms ease-out;
+  }
+
+  #shareBtn:hover {
+    background: rgba(68, 138, 255, 0.12);
+    border-color: rgba(68, 138, 255, 0.3);
+    transform: translateY(-1px);
+  }
+
+  #shareBtn:active {
     transform: translateY(0);
   }
 
@@ -1503,6 +1527,7 @@
 <div id="topNav" class="top-nav-container">
   <button id="backBtn">&lt; 돌아가기</button>
   <span id="currentSection" class="top-nav-section"></span>
+  <button id="shareBtn" title="공유하기">🔗 공유</button>
 </div>
 
 <div class="layout">
@@ -1668,6 +1693,13 @@ function fillVoiceMenu() {
   sel.value = ko.some((v) => v.name === chosen) ? chosen : ko[0].name; // ko[0] = best pick
 }
 
+// Chrome은 아무도 강한 참조를 들고 있지 않으면 재생 중인 utterance를 GC해버려
+// onend가 영영 안 붙는 버그가 있다(https://bugs.chromium.org/p/chromium/issues/detail?id=509488).
+// iOS Safari는 그보다 더 심해서, 이전 발화가 끝나도 내부적으로 멈춰 있는 채로 고착돼
+// 다음 speak()가 아예 재생되지 않는 경우가 있다 — 매번 cancel()로 큐를 리셋해야 한다.
+// 참조를 붙잡아 두는 것과 cancel() 리셋만으론 부족할 수 있어, 텍스트 길이 기준 안전
+// 타임아웃도 같이 둬서 이벤트가 안 와도 다음 문제로 계속 넘어가게 한다.
+let currentUtterance = null;
 function speak(text, rate) {
   return new Promise((res) => {
     const u = new SpeechSynthesisUtterance(text);
@@ -1675,8 +1707,24 @@ function speak(text, rate) {
     const ko = koVoices();
     const v = ko.find((x) => x.name === $("voice").value) || ko[0];
     if (v) u.voice = v;
-    u.onend = res; u.onerror = res;
-    speechSynthesis.speak(u);
+    currentUtterance = u;
+    let done = false;
+    const finish = () => {
+      if (done) return;
+      done = true;
+      currentUtterance = null;
+      res();
+    };
+    u.onend = finish;
+    u.onerror = finish;
+    try {
+      speechSynthesis.cancel();
+      speechSynthesis.speak(u);
+    } catch {
+      finish();
+      return;
+    }
+    setTimeout(finish, Math.max(3000, (text.length * 350) / rate));
   });
 }
 const wait = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -1862,15 +1910,20 @@ async function playAll() {
   updatePlayBtn();
   const problems = curProblems();
   const rate = +$("rate").value, reps = +$("rep").value, gap = +$("gap").value * 1000;
-  for (let i = 0; i < problems.length && myGen === playGen; i++) {
-    setActive(i);
-    await readProblem(problems[i].text, rate, reps, gap, myGen);
-    if (i < problems.length - 1 && myGen === playGen) await wait(gap);
-  }
-  if (myGen === playGen) {
-    setActive(-1);
-    isPlayingAll = false;
-    updatePlayBtn();
+  try {
+    for (let i = 0; i < problems.length && myGen === playGen; i++) {
+      setActive(i);
+      await readProblem(problems[i].text, rate, reps, gap, myGen);
+      if (i < problems.length - 1 && myGen === playGen) await wait(gap);
+    }
+  } catch (err) {
+    console.error("자동재생 오류:", err);
+  } finally {
+    if (myGen === playGen) {
+      setActive(-1);
+      isPlayingAll = false;
+      updatePlayBtn();
+    }
   }
 }
 
@@ -2167,6 +2220,19 @@ $("skipSave").onclick = () => {
 
 document.querySelector("h1").onclick = goHome;
 $("backBtn").onclick = goHome;
+
+$("shareBtn").onclick = async () => {
+  const title = $("currentSection").textContent || "받아쓰기 문제";
+  const text = groups
+    .map((g) => `[${g.title}]\n` + g.problems.map((p) => `${p.number}. ${p.text}`).join("\n"))
+    .join("\n\n");
+  if (navigator.share) {
+    try { await navigator.share({ title, text }); } catch { /* 사용자 취소 */ }
+  } else {
+    await navigator.clipboard.writeText(`${title}\n\n${text}`);
+    $("status").innerHTML = `<strong class="text-tertiary">✓ 문제 내용을 클립보드에 복사했어요</strong>`;
+  }
+};
 
 // 브라우저 뒤로가기 처리
 window.addEventListener("popstate", (e) => {
