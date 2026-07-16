@@ -44,226 +44,210 @@
     --sans: "Hakgyoansim Badasseugi", "Nunito", "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
   }
 
-  @media (prefers-color-scheme: dark) {
-    :root {
-      --primary: #1a1a2e;
-      --secondary: #e8e8f0;
-    }
+  /* 다크모드: 시스템 설정을 기본값으로 따르되, JS가 :root에 data-theme를 세팅해
+     명시적 사용자 선택(localStorage)이 있으면 그게 항상 이긴다. */
+  :root[data-theme="dark"] {
+    --primary: #1a1a2e;
+    --secondary: #e8e8f0;
+  }
 
-    /* Core components */
-    body {
-      background: #161620 !important;
-      color: #e8e8f0 !important;
-    }
+  /* Core components */
+  :root[data-theme="dark"] body {
+    background: #161620 !important;
+    color: #e8e8f0 !important;
+  }
 
-    .hero {
-      background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1)) !important;
-      border-color: rgba(68, 138, 255, 0.3) !important;
-    }
+  :root[data-theme="dark"] .hero {
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1)) !important;
+    border-color: rgba(68, 138, 255, 0.3) !important;
+  }
 
-    .pick {
-      background: linear-gradient(135deg, #5eb3ff, #4a99ff) !important;
-      color: white !important;
-    }
+  :root[data-theme="dark"] .pick {
+    background: linear-gradient(135deg, #5eb3ff, #4a99ff) !important;
+    color: white !important;
+  }
 
-    /* Controls & Forms */
-    .controls {
-      background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.05)) !important;
-      border-color: rgba(68, 138, 255, 0.25) !important;
-    }
+  /* Controls & Forms */
+  :root[data-theme="dark"] .controls {
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.1), rgba(105, 240, 174, 0.05)) !important;
+    border-color: rgba(68, 138, 255, 0.25) !important;
+  }
 
-    .row select,
-    #gradeForSave,
-    #gradeSelect {
-      background: #2a2a3e !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-      color: #e8e8f0 !important;
-    }
+  :root[data-theme="dark"] .row select,
+  :root[data-theme="dark"] #gradeForSave,
+  :root[data-theme="dark"] #gradeSelect {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+    color: #e8e8f0 !important;
+  }
 
-    .row label {
-      color: #b0b0ff !important;
-    }
+  :root[data-theme="dark"] .row label {
+    color: #b0b0ff !important;
+  }
 
-    .row .val {
-      color: #ff9070 !important;
-    }
+  :root[data-theme="dark"] .row .val {
+    color: #ff9070 !important;
+  }
 
-    /* Tabs & Navigation */
-    .tabs button {
-      background: rgba(68, 138, 255, 0.1) !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-      color: #b0b0ff !important;
-    }
+  /* Tabs & Navigation */
+  :root[data-theme="dark"] .tabs button {
+    background: rgba(68, 138, 255, 0.1) !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+    color: #b0b0ff !important;
+  }
 
-    .tabs button.on {
-      background: #448AFF !important;
-      color: white !important;
-      border-color: #448AFF !important;
-    }
+  :root[data-theme="dark"] .tabs button.on {
+    background: #448AFF !important;
+    color: white !important;
+    border-color: #448AFF !important;
+  }
 
-    .grouptitle {
-      color: #e8e8f0 !important;
-    }
+  :root[data-theme="dark"] .grouptitle {
+    color: #e8e8f0 !important;
+  }
 
-    /* Cards & Lists */
-    .card {
-      background: #2a2a3e !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-      color: #e8e8f0 !important;
-    }
+  /* Cards & Lists */
+  :root[data-theme="dark"] .card {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+    color: #e8e8f0 !important;
+  }
 
-    .card.active {
-      background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1)) !important;
-      border-color: rgba(68, 138, 255, 0.3) !important;
-    }
+  :root[data-theme="dark"] .card.active {
+    background: linear-gradient(135deg, rgba(68, 138, 255, 0.15), rgba(105, 240, 174, 0.1)) !important;
+    border-color: rgba(68, 138, 255, 0.3) !important;
+  }
 
-    .num {
-      background: rgba(68, 138, 255, 0.2) !important;
-      border-color: #448AFF !important;
-      color: #b0d4ff !important;
-    }
+  :root[data-theme="dark"] .num {
+    background: rgba(68, 138, 255, 0.2) !important;
+    border-color: #448AFF !important;
+    color: #b0d4ff !important;
+  }
 
-    .txt {
-      color: #e8e8f0 !important;
-    }
+  :root[data-theme="dark"] .txt {
+    color: #e8e8f0 !important;
+  }
 
-    .txt.hidden {
-      background: rgba(68, 138, 255, 0.25) !important;
-      border-color: rgba(68, 138, 255, 0.4) !important;
-      color: transparent !important;
-    }
+  :root[data-theme="dark"] .txt.hidden {
+    background: rgba(68, 138, 255, 0.25) !important;
+    border-color: rgba(68, 138, 255, 0.4) !important;
+    color: transparent !important;
+  }
 
-    .txt.hidden::after {
-      color: #7ec8ff !important;
-    }
+  :root[data-theme="dark"] .txt.hidden::after {
+    color: #7ec8ff !important;
+  }
 
-    .play {
-      background: linear-gradient(135deg, #ff9070, #ff7550) !important;
-    }
+  :root[data-theme="dark"] .play {
+    background: linear-gradient(135deg, #ff9070, #ff7550) !important;
+  }
 
-    .play.playing {
-      background: linear-gradient(135deg, #7ed321, #6bc915) !important;
-    }
+  :root[data-theme="dark"] .play.playing {
+    background: linear-gradient(135deg, #7ed321, #6bc915) !important;
+  }
 
-    /* Buttons */
-    .btn-primary {
-      background: linear-gradient(135deg, #ff9070, #ff7550) !important;
-      color: white !important;
-      box-shadow: 0 2px 8px rgba(255, 112, 67, 0.3) !important;
-    }
+  /* Buttons */
+  :root[data-theme="dark"] .btn-primary {
+    background: linear-gradient(135deg, #ff9070, #ff7550) !important;
+    color: white !important;
+    box-shadow: 0 2px 8px rgba(255, 112, 67, 0.3) !important;
+  }
 
-    .btn-ghost {
-      background: rgba(68, 138, 255, 0.1) !important;
-      border-color: rgba(68, 138, 255, 0.25) !important;
-      color: #b0b0ff !important;
-    }
+  :root[data-theme="dark"] .btn-ghost {
+    background: rgba(68, 138, 255, 0.1) !important;
+    border-color: rgba(68, 138, 255, 0.25) !important;
+    color: #b0b0ff !important;
+  }
 
-    .btn-ghost:hover {
-      background: rgba(68, 138, 255, 0.15) !important;
-      border-color: rgba(68, 138, 255, 0.3) !important;
-    }
+  :root[data-theme="dark"] .btn-ghost:hover {
+    background: rgba(68, 138, 255, 0.15) !important;
+    border-color: rgba(68, 138, 255, 0.3) !important;
+  }
 
-    #backBtn {
-      background: rgba(68, 138, 255, 0.1) !important;
-      border-color: rgba(68, 138, 255, 0.25) !important;
-      color: #b0b0ff !important;
-    }
+  :root[data-theme="dark"] #backBtn {
+    background: rgba(68, 138, 255, 0.1) !important;
+    border-color: rgba(68, 138, 255, 0.25) !important;
+    color: #b0b0ff !important;
+  }
 
-    /* Modals */
-    .modal-overlay {
-      background: rgba(0, 0, 0, 0.6) !important;
-    }
+  /* Modals */
+  :root[data-theme="dark"] .modal-overlay {
+    background: rgba(0, 0, 0, 0.6) !important;
+  }
 
-    .modal-content {
-      background: #2a2a3e !important;
-      border-color: rgba(105, 240, 174, 0.15) !important;
-      color: #e8e8f0 !important;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
-    }
+  :root[data-theme="dark"] .modal-content {
+    background: #2a2a3e !important;
+    border-color: rgba(105, 240, 174, 0.15) !important;
+    color: #e8e8f0 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+  }
 
-    .modal-title {
-      color: #7ec8ff !important;
-    }
+  :root[data-theme="dark"] .modal-title {
+    color: #7ec8ff !important;
+  }
 
-    .modal-title.warning {
-      color: #ff9070 !important;
-    }
+  :root[data-theme="dark"] .modal-title.warning {
+    color: #ff9070 !important;
+  }
 
-    .modal-description {
-      color: #b0b0c0 !important;
-    }
+  :root[data-theme="dark"] .modal-description {
+    color: #b0b0c0 !important;
+  }
 
-    .modal-actions button {
-      border-color: rgba(68, 138, 255, 0.2) !important;
-    }
+  :root[data-theme="dark"] .modal-actions button {
+    border-color: rgba(68, 138, 255, 0.2) !important;
+  }
 
-    /* Photo Guide */
-    .photo-guide-checklist-col {
-      color: #e8e8f0 !important;
-    }
+  /* Photo Guide */
+  :root[data-theme="dark"] .photo-guide-checklist-col {
+    color: #e8e8f0 !important;
+  }
 
-    .photo-guide-checklist-title {
-      color: #7ec8ff !important;
-    }
+  :root[data-theme="dark"] .photo-guide-checklist-title {
+    color: #7ec8ff !important;
+  }
 
-    .photo-guide-checklist-title.good {
-      color: #7ed321 !important;
-    }
+  :root[data-theme="dark"] .photo-guide-checklist-title.good {
+    color: #7ed321 !important;
+  }
 
-    .photo-guide-checklist-title.bad {
-      color: #ff9070 !important;
-    }
+  :root[data-theme="dark"] .photo-guide-checklist-title.bad {
+    color: #ff9070 !important;
+  }
 
-    .photo-guide-examples-title {
-      color: #7ec8ff !important;
-    }
+  :root[data-theme="dark"] .photo-guide-examples-title {
+    color: #7ec8ff !important;
+  }
 
-    .photo-guide-example-item {
-      background: #2a2a3e !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-    }
+  :root[data-theme="dark"] .photo-guide-example-item {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+  }
 
-    .photo-guide-example-img {
-      background: rgba(68, 138, 255, 0.1) !important;
-    }
+  :root[data-theme="dark"] .photo-guide-example-img {
+    background: rgba(68, 138, 255, 0.1) !important;
+  }
 
-    .photo-guide-example-label {
-      background: rgba(105, 240, 174, 0.08) !important;
-      color: #7ed321 !important;
-      border-color: rgba(68, 138, 255, 0.15) !important;
-    }
+  :root[data-theme="dark"] .photo-guide-example-label {
+    background: rgba(105, 240, 174, 0.08) !important;
+    color: #7ed321 !important;
+    border-color: rgba(68, 138, 255, 0.15) !important;
+  }
 
-    /* Sidebar */
-    .sidebar h2 {
-      color: #b0b0ff !important;
-    }
+  /* Status & Install Banner */
+  :root[data-theme="dark"] #installBanner {
+    background: linear-gradient(135deg, #2a2a3e, rgba(68, 138, 255, 0.08)) !important;
+    border-top-color: rgba(68, 138, 255, 0.25) !important;
+    color: #e8e8f0 !important;
+  }
 
-    .sidebar button {
-      background: rgba(68, 138, 255, 0.1) !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-      color: #b0b0ff !important;
-    }
+  :root[data-theme="dark"] #installBanner button {
+    background: #448AFF !important;
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.3) !important;
+  }
 
-    .sidebar button:hover {
-      background: rgba(68, 138, 255, 0.15) !important;
-      border-color: rgba(68, 138, 255, 0.3) !important;
-    }
-
-    /* Status & Install Banner */
-    #installBanner {
-      background: linear-gradient(135deg, #2a2a3e, rgba(68, 138, 255, 0.08)) !important;
-      border-top-color: rgba(68, 138, 255, 0.25) !important;
-      color: #e8e8f0 !important;
-    }
-
-    #installBanner button {
-      background: #448AFF !important;
-      box-shadow: 0 2px 8px rgba(68, 138, 255, 0.3) !important;
-    }
-
-    .status {
-      color: #b0b0ff !important;
-    }
+  :root[data-theme="dark"] .status {
+    color: #b0b0ff !important;
   }
 
   @keyframes slideUp {
@@ -281,7 +265,7 @@
   * { box-sizing: border-box; }
   button, input, select, textarea { font-family: inherit; font-size: inherit; }
   [hidden] { display: none !important; }
-  .tabs:empty, .grouptitle:empty { display: none; }
+  .tabs:empty, .grouptitle:empty, .status:empty { display: none; }
 
   html { color-scheme: light dark; font-size: 112.5%; } /* 16px → 18px base; most sizes below are rem so this scales everything */
 
@@ -308,6 +292,7 @@
     border: 1px solid rgba(68, 138, 255, 0.2);
     box-shadow: 0 8px 24px rgba(68, 138, 255, 0.12);
     animation: slideUp 0.54s ease-out;
+    view-transition-name: hero-nav;
   }
 
   .eyebrow {
@@ -388,7 +373,7 @@
   .controls {
     display: grid;
     gap: 0.75rem;
-    margin: 1.5rem 0;
+    margin: 1rem 0 1.5rem;
     padding: 1.5rem;
     background: linear-gradient(135deg, rgba(68, 138, 255, 0.04), rgba(102, 187, 106, 0.04));
     border-radius: var(--r-md);
@@ -656,6 +641,7 @@
     font-weight: 600;
     border-radius: var(--r-md);
     transition: all 200ms ease-out;
+    margin-left: -10px;
   }
 
   #backBtn:hover {
@@ -740,45 +726,6 @@
     min-width: 0;
   }
 
-  .sidebar {
-    flex: 0 0 12.5rem;
-    position: sticky;
-    top: 1.5rem;
-    z-index: 3;
-  }
-
-  .sidebar h2 {
-    margin: 0 0 0.75rem;
-    font-family: var(--sans);
-    font-size: 0.75rem;
-    font-weight: 700;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--neutral);
-  }
-
-  .sidebar button {
-    display: block;
-    width: 100%;
-    margin: 0.375rem 0;
-    padding: 0.625rem 0.75rem;
-    text-align: left;
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 500;
-    color: var(--neutral);
-    background: rgba(68, 138, 255, 0.08);
-    border: 1px solid rgba(68, 138, 255, 0.2);
-    border-radius: var(--r-md);
-    cursor: pointer;
-    transition: all 200ms ease-out;
-  }
-
-  .sidebar button:hover {
-    background: rgba(68, 138, 255, 0.12);
-    border-color: rgba(68, 138, 255, 0.3);
-  }
-
   /* Modal styles */
   .modal-overlay {
     display: none;
@@ -804,24 +751,22 @@
     box-shadow: 0 12px 32px rgba(68, 138, 255, 0.12);
   }
 
-  @media (prefers-color-scheme: dark) {
-    .modal-content {
-      background: #2a2a3e !important;
-      border-color: rgba(105, 240, 174, 0.15) !important;
-      color: #e8e8f0 !important;
-      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
-    }
+  :root[data-theme="dark"] .modal-content {
+    background: #2a2a3e !important;
+    border-color: rgba(105, 240, 174, 0.15) !important;
+    color: #e8e8f0 !important;
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5) !important;
+  }
 
-    .top-nav-container {
-      background: #2a2a3e !important;
-      border-color: rgba(68, 138, 255, 0.2) !important;
-      color: #e8e8f0 !important;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
-    }
+  :root[data-theme="dark"] .top-nav-container {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+    color: #e8e8f0 !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+  }
 
-    .top-nav-section {
-      color: #7ec8ff !important;
-    }
+  :root[data-theme="dark"] .top-nav-section {
+    color: #7ec8ff !important;
   }
 
   .modal-title {
@@ -966,10 +911,6 @@
     .layout {
       flex-direction: column;
       align-items: stretch;
-    }
-    .sidebar {
-      position: static;
-      flex: 0 0 auto;
     }
   }
 
@@ -1338,39 +1279,40 @@
   /* Navigation */
   .top-nav-container {
     display: none;
-    margin: 0 auto 1.5rem;
+    margin: 0 auto;
     padding: 1rem 1.5rem;
     width: 100%;
     max-width: 40rem;
-    background: white;
-    border: 1px solid rgba(68, 138, 255, 0.15);
+    background: linear-gradient(135deg, rgb(219, 232, 254), rgb(222, 240, 248)); /* 히어로 그라디언트가 페이지 배경(--primary: #E8F0FE) 위에서 실제로 보이는 색의 불투명 버전 */
+    border: 1px solid rgba(68, 138, 255, 0.2);
     border-radius: 8px;
     font-family: var(--sans);
     font-size: 0.9rem;
     box-sizing: border-box;
     align-items: center;
-    gap: 1.5rem;
+    gap: 8px;
     box-shadow: 0 2px 8px rgba(68, 138, 255, 0.08);
     color: var(--secondary);
+    view-transition-name: hero-nav;
   }
 
-  .top-nav-container.show {
-    display: flex;
+  /* 상세 페이지 상단 네비: 모바일에서는 좌우 여백 없이 꽉 채우고 스크롤해도 상단에 고정 */
+  @media (max-width: 52rem) {
+    .top-nav-container {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      width: auto;
+      max-width: none;
+      margin: -1.5rem -1.5rem 0;
+      border-radius: 0;
+    }
   }
 
   .top-nav-section {
     color: var(--neutral);
     flex: 1;
     font-weight: 600;
-  }
-
-  /* Sidebar visibility */
-  .sidebar.show {
-    display: block;
-  }
-
-  .sidebar-hidden {
-    display: none;
   }
 
   /* Controls visibility */
@@ -1406,7 +1348,6 @@
     display: flex;
     gap: 0.5rem;
     margin: 0.5rem 0;
-    justify-content: center;
   }
 
   /* Install banner styles */
@@ -1435,9 +1376,43 @@
   .random-controls {
     margin-top: 0.5rem;
   }
+
+  /* Theme toggle — 항상 화면에 떠 있는 고정 버튼 */
+  .theme-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 1rem;
+    z-index: 150;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: var(--r-full);
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.15);
+    cursor: pointer;
+  }
+
+  :root[data-theme="dark"] .theme-toggle {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.25) !important;
+  }
+
+  /* 광고 미승인/미채움 상태의 예약 영역이 흰 박스로 보이는 것 방지 (!important로 애드센스 인라인 스타일과 경쟁) */
+  .adsbygoogle {
+    background: var(--primary) !important;
+  }
+
+  :root[data-theme="dark"] .adsbygoogle {
+    background: #161620 !important;
+  }
 </style>
 </head>
 <body>
+<button id="themeToggle" class="theme-toggle" title="화면 모드 전환"></button>
 <div id="processingBanner" class="processing-banner">
   <div class="processing-banner-title">⏳ 글자를 읽고 문제를 분류하는 중입니다</div>
   <div class="processing-banner-subtitle">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
@@ -1524,10 +1499,6 @@
 </div>
 
 <div class="layout">
-  <aside class="sidebar sidebar-hidden" id="savedWrap">
-    <h2>저장된 세트</h2>
-    <div id="saved"></div>
-  </aside>
   <main class="main">
 <div class="hero" id="hero">
   <p class="eyebrow">Dictation · 받아쓰기</p>
@@ -1546,6 +1517,7 @@
 
 <div id="gradeSelectUI" class="grade-select-ui">
   <div class="grade-select-label">학년을 선택하고 저장하세요:</div>
+  <div class="text-xs text-secondary opacity-90 mb-sm">저장하면 같은 학년 사용자와 공유되는 문제은행에 등록돼요. 저장하지 않아도 지금 화면에서 바로 들을 수 있어요.</div>
   <div class="grade-select-controls">
     <select id="gradeForSave" class="grade-select-input">
       <option value="1학년">1학년</option>
@@ -1556,11 +1528,12 @@
       <option value="6학년">6학년</option>
     </select>
     <button id="saveWithGrade" class="btn-primary grade-select-btn">저장</button>
+    <button id="skipSave" class="btn-ghost grade-select-btn">건너뛰기</button>
   </div>
 </div>
 
 <div class="button-group-lg">
-  <button id="showRandomBtn" class="btn-ghost button-row-shrink btn-sm">문제 랜덤 생성하기</button>
+  <button id="showRandomBtn" class="btn-ghost w-full btn-sm">학년별 문제 만들기</button>
 </div>
 
 <div class="controls controls-hidden random-controls" id="randomControls">
@@ -1592,7 +1565,8 @@
     <span class="val" id="gapV">5초</span></div>
   <div class="row"><label>음성</label>
     <select id="voice"></select></div>
-  <div class="row"><label>정답 보기</label>
+  <div id="voiceWarning" class="text-accent text-xs" hidden>⚠️ 이 기기에는 한국어 음성이 없어 소리가 나지 않을 수 있어요. Chrome 등 다른 브라우저를 사용해보세요.</div>
+  <div class="row"><label for="reveal">정답 보기</label>
     <input type="checkbox" id="reveal" /></div>
   <div class="actions">
     <button class="btn-primary" id="playAll">자동재생</button>
@@ -1680,6 +1654,7 @@ loadVoices();
 // Populate the dropdown; default to the best-scored voice (unless user already chose).
 function fillVoiceMenu() {
   const sel = $("voice"), ko = koVoices();
+  $("voiceWarning").hidden = ko.length > 0;
   if (!ko.length) return;
   const chosen = sel.value;
   sel.innerHTML = ko.map((v) => `<option value="${v.name}">${v.name}</option>`).join("");
@@ -1730,11 +1705,19 @@ function updateUIVisibility() {
   if (isHome) hideNav();
 }
 
+// 홈 ↔ 상세 전환 시 히어로/상단 네비를 View Transitions API로 모프. 미지원 브라우저는 그냥 즉시 전환.
+// 스크롤 위치도 항상 최상단으로 — SPA라 실제 페이지 이동이 아니라 그대로 두면 이전 스크롤 위치가 남는다.
+function withViewTransition(fn) {
+  const run = () => { fn(); window.scrollTo(0, 0); };
+  if (document.startViewTransition) document.startViewTransition(run);
+  else run();
+}
+
 function showNav(title) {
   const nav = $("topNav");
   const section = $("currentSection");
   section.textContent = title || "문제 풀이";
-  nav.style.display = "block";
+  nav.style.display = "flex";
 }
 
 function hideNav() {
@@ -1785,15 +1768,17 @@ function shuffleProblems() {
 
 function goHome() {
   stop();
-  groups = [];
-  current = 0;
-  $("list").innerHTML = "";
-  $("tabs").innerHTML = "";
-  $("groupTitle").textContent = "";
-  $("status").textContent = "";
-  $("controls").hidden = true;
-  hideNav();
-  updateUIVisibility();
+  withViewTransition(() => {
+    groups = [];
+    current = 0;
+    $("list").innerHTML = "";
+    $("tabs").innerHTML = "";
+    $("groupTitle").textContent = "";
+    $("status").textContent = "";
+    $("controls").hidden = true;
+    hideNav();
+    updateUIVisibility();
+  });
 }
 
 // ---- rendering ----
@@ -1801,6 +1786,7 @@ function setActive(idx) {
   [...$("list").children].forEach((el, i) => {
     el.classList.toggle("active", i === idx);
     el.querySelector(".play").classList.toggle("playing", i === idx);
+    if (i === idx) el.scrollIntoView({ block: "center", behavior: "smooth" });
   });
 }
 
@@ -1817,6 +1803,7 @@ function updatePlayBtn() {
 
 function renderTabs() {
   $("tabs").innerHTML = "";
+  if (groups.length <= 1) return; // 급수가 1개뿐이면 전환할 탭이 없으니 숨김(:empty CSS)
   groups.forEach((g, i) => {
     const b = document.createElement("button");
     // label = leading token of the title (e.g. "1급"), else the full title
@@ -1897,7 +1884,7 @@ function canMakeRequest() {
     .filter(t => t > hourAgo);
 
   if (attempts.length >= MAX_ATTEMPTS_PER_HOUR) {
-    return { allowed: false, message: "시간당 요청 제한에 도달했습니다. 잠시 후 다시 시도하세요." };
+    return { allowed: false, message: "시간당 요청 제한에 도달했습니다. 잠시 후 다시 시도하세요. 계속 안 되면 '학년별 문제 만들기'로 랜덤 문제를 만들어 이용해보세요." };
   }
 
   return { allowed: true };
@@ -2020,9 +2007,10 @@ const handleFileSelect = async (e) => {
 
     // 학년 선택 UI 표시 (저장 전 학년 결정)
     $("gradeSelectUI").style.display = "block";
-    showNav(groups[0]?.title);
-
-    render();
+    withViewTransition(() => {
+      showNav(groups[0]?.title);
+      render();
+    });
   } catch (err) {
     $("status").textContent = "오류: " + err.message;
   } finally {
@@ -2049,8 +2037,6 @@ const KEY = "dictation-sets";
 const getSets = () => JSON.parse(localStorage.getItem(KEY) || "[]");
 function renderSaved() {
   const sets = getSets();
-  $("savedWrap").hidden = sets.length === 0;
-  $("saved").innerHTML = "";
   $("homeSavedList").innerHTML = "";
 
   sets.forEach((s, idx) => {
@@ -2095,14 +2081,6 @@ function renderSaved() {
     homeContainer.appendChild(renameBtn);
     homeContainer.appendChild(deleteBtn);
     $("homeSavedList").appendChild(homeContainer);
-
-    // 사이드바 버튼 (레거시)
-    const b = document.createElement("button");
-    b.textContent = `${s.name} (${s.groups.length}급수 · ${count}문제)`;
-    b.onclick = loadSet;
-    b.dataset.name = s.name;
-    b.dataset.groups = JSON.stringify(s.groups);
-    $("saved").appendChild(b);
   });
 
   $("homeSection").style.display = sets.length === 0 ? "none" : "block";
@@ -2122,9 +2100,11 @@ function loadSet(e) {
   const groupsData = JSON.parse(e.currentTarget.dataset.groups);
   groups = groupsData;
   current = 0;
-  showNav(name);
-  $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
-  render();
+  withViewTransition(() => {
+    showNav(name);
+    $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
+    render();
+  });
 
   // History API: 뒤로가기 시 홈으로 돌아가기
   history.pushState({ isDetail: true }, "detail", "#detail");
@@ -2174,6 +2154,10 @@ $("saveWithGrade").onclick = async () => {
   }
 };
 
+$("skipSave").onclick = () => {
+  $("gradeSelectUI").style.display = "none";
+};
+
 document.querySelector("h1").onclick = goHome;
 $("backBtn").onclick = goHome;
 
@@ -2191,6 +2175,33 @@ history.replaceState({ isHome: true }, "home", "#");
 
 updateUIVisibility(); // 초기 상태: pickBtn 표시
 renderSaved();
+
+// ---- Theme (light/dark) ----
+// localStorage에 명시적 선택이 있으면 그걸 항상 우선. 없으면 시스템 설정을 따르고,
+// 앱이 열려 있는 동안 시스템 설정이 바뀌면 실시간으로 반영한다.
+const THEME_KEY = "dictation-theme";
+const systemDark = window.matchMedia("(prefers-color-scheme: dark)");
+
+function currentTheme() {
+  return localStorage.getItem(THEME_KEY) || (systemDark.matches ? "dark" : "light");
+}
+
+function applyTheme(theme) {
+  document.documentElement.dataset.theme = theme;
+  document.documentElement.style.colorScheme = theme; // 네이티브 스크롤바/폼 요소도 맞춤
+  $("themeToggle").textContent = theme === "dark" ? "☀️" : "🌙";
+}
+
+applyTheme(currentTheme());
+systemDark.addEventListener("change", () => {
+  if (!localStorage.getItem(THEME_KEY)) applyTheme(currentTheme());
+});
+
+$("themeToggle").onclick = () => {
+  const next = document.documentElement.dataset.theme === "dark" ? "light" : "dark";
+  localStorage.setItem(THEME_KEY, next);
+  applyTheme(next);
+};
 
 // ---- PWA Install ----
 let deferredPrompt;
@@ -2332,9 +2343,11 @@ $("generateRandom").onclick = async () => {
 
     // 바로 문제 상세 페이지로 이동
     $("randomControls").classList.add("controls-hidden");
-    showNav(groups[0]?.title);
-    $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
-    render();
+    withViewTransition(() => {
+      showNav(groups[0]?.title);
+      $("status").textContent = ""; // 상태 영역 비움 (네비게이션에 제목 표시됨)
+      render();
+    });
   } catch (err) {
     $("status").textContent = "오류: " + err.message;
   } finally {

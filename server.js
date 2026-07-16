@@ -8,6 +8,9 @@ const PORT = process.env.PORT || 3100;
 // ponytail: model as env var so a newer Flash needs no code change.
 // 기본값은 EOS되지 않는 별칭(항상 최신 Flash).
 const GEMINI_MODEL = process.env.GEMINI_MODEL || "gemini-flash-latest";
+// 기본 모델이 호출 제한(429)에 걸렸을 때 전환할 모델 — 별도 쿼터라 재시도가 통과할 확률이 높다.
+const GEMINI_FALLBACK_MODEL = process.env.GEMINI_FALLBACK_MODEL || "gemini-flash-lite-latest";
+const wait = (ms) => new Promise((res) => setTimeout(res, ms));
 
 // IP 기반 요청 제한 (메모리 저장, 서버 재시작 시 초기화)
 const MIN_INTERVAL_MS = 2000; // IP당 최소 2초 간격
@@ -114,6 +117,7 @@ const RESPONSE_SCHEMA = {
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const PROBLEMS_DB = join(__dirname, "problems-db.json");
+const STATS_DB = join(__dirname, "stats-db.json");
 const log = (...a) => console.log(new Date().toISOString(), ...a);
 
 // ponytail: 로컬 개발은 그대로 파일로. 배포 환경(컨테이너 재시작 시 디스크 초기화)에서만
@@ -121,35 +125,49 @@ const log = (...a) => console.log(new Date().toISOString(), ...a);
 const REDIS_URL = process.env.UPSTASH_REDIS_REST_URL;
 const REDIS_TOKEN = process.env.UPSTASH_REDIS_REST_TOKEN;
 const REDIS_DB_KEY = "problems-db";
+const STATS_REDIS_KEY = "stats-db";
 
-// 문제 DB 관리
-async function loadProblemsDB() {
+// 파일 또는 Redis에 저장되는 JSON 저장소 (문제 DB, 통계 등 공용)
+async function loadJSONStore(filePath, redisKey) {
   if (REDIS_URL) {
-    const r = await fetch(`${REDIS_URL}/get/${REDIS_DB_KEY}`, {
+    const r = await fetch(`${REDIS_URL}/get/${redisKey}`, {
       headers: { authorization: `Bearer ${REDIS_TOKEN}` },
     });
     const { result } = await r.json();
-    return result ? JSON.parse(result) : {};
+    return result ? JSON.parse(result) : null;
   }
-  if (!existsSync(PROBLEMS_DB)) return {};
+  if (!existsSync(filePath)) return null;
   try {
-    const data = await readFile(PROBLEMS_DB, "utf8");
-    return JSON.parse(data);
+    return JSON.parse(await readFile(filePath, "utf8"));
   } catch {
-    return {};
+    return null;
   }
 }
 
-async function saveProblemsDB(db) {
+async function saveJSONStore(filePath, redisKey, data) {
   if (REDIS_URL) {
-    await fetch(`${REDIS_URL}/set/${REDIS_DB_KEY}`, {
+    await fetch(`${REDIS_URL}/set/${redisKey}`, {
       method: "POST",
       headers: { authorization: `Bearer ${REDIS_TOKEN}` },
-      body: JSON.stringify(db),
+      body: JSON.stringify(data),
     });
     return;
   }
-  await writeFile(PROBLEMS_DB, JSON.stringify(db, null, 2), "utf8");
+  await writeFile(filePath, JSON.stringify(data, null, 2), "utf8");
+}
+
+async function loadProblemsDB() {
+  return (await loadJSONStore(PROBLEMS_DB, REDIS_DB_KEY)) || {};
+}
+async function saveProblemsDB(db) {
+  return saveJSONStore(PROBLEMS_DB, REDIS_DB_KEY, db);
+}
+
+async function loadStats() {
+  return (await loadJSONStore(STATS_DB, STATS_REDIS_KEY)) || { extract: { attempts: 0, success: 0, fail: 0 }, saves: {} };
+}
+async function saveStats(stats) {
+  return saveJSONStore(STATS_DB, STATS_REDIS_KEY, stats);
 }
 
 function extractGradeFromTitle(title) {
@@ -193,18 +211,25 @@ const PROMPT =
   "반드시 아래 JSON 형식으로만 응답하세요(설명 문장 없이 JSON만):\n" +
   '{"groups":[{"title":"급수/단원 제목","problems":[{"number":1,"text":"문장"}]}]}';
 
-export async function extract(base64, mediaType) {
+// retryable=true인 에러만 extract()가 재시도/모델 전환 대상으로 삼는다.
+function taggedError(message, retryable) {
+  const e = new Error(message);
+  e.retryable = retryable;
+  return e;
+}
+
+async function callGeminiOnce(base64, mediaType, model) {
   const key = process.env.GEMINI_API_KEY;
-  if (!key) throw new Error("GEMINI_API_KEY 환경변수가 설정되지 않았습니다.");
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
+  if (!key) throw taggedError("GEMINI_API_KEY 환경변수가 설정되지 않았습니다.", false);
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
   const generationConfig = {
     responseMimeType: "application/json",
     responseSchema: RESPONSE_SCHEMA,
     maxOutputTokens: 16384,
   };
   // OCR엔 추론 불필요 → 2.5 Flash는 thinking을 끄면 훨씬 빠르다. (3.x는 0을 거부하므로 건너뜀)
-  if (GEMINI_MODEL.includes("2.5")) generationConfig.thinkingConfig = { thinkingBudget: 0 };
-  log(`Gemini 호출 중… (model=${GEMINI_MODEL})`);
+  if (model.includes("2.5")) generationConfig.thinkingConfig = { thinkingBudget: 0 };
+  log(`Gemini 호출 중… (model=${model})`);
   const t0 = Date.now();
   let r;
   try {
@@ -225,12 +250,16 @@ export async function extract(base64, mediaType) {
       signal: AbortSignal.timeout(90000), // ponytail: 무한 대기 방지, 90초면 충분
     });
   } catch (e) {
-    if (e.name === "TimeoutError") throw new Error("Gemini 응답이 90초 내에 오지 않았습니다. 다시 시도해 주세요.");
-    throw e;
+    if (e.name === "TimeoutError") throw taggedError("Gemini 응답이 90초 내에 오지 않았습니다.", true);
+    throw taggedError(e.message, true); // 네트워크 오류 등은 재시도 대상
   }
   const data = await r.json();
-  log(`Gemini 응답 ${r.status} (${((Date.now() - t0) / 1000).toFixed(1)}s)`);
-  if (!r.ok) throw new Error(data?.error?.message || `Gemini ${r.status}`);
+  log(`Gemini 응답 ${r.status} (${((Date.now() - t0) / 1000).toFixed(1)}s, model=${model})`);
+  if (!r.ok) {
+    // 429(호출 제한)·503(과부하)·5xx는 재시도하면 통과할 가능성이 있다.
+    const retryable = r.status === 429 || r.status >= 500;
+    throw taggedError(data?.error?.message || `Gemini ${r.status}`, retryable);
+  }
 
   const cand = data?.candidates?.[0];
   const finish = cand?.finishReason;
@@ -240,7 +269,7 @@ export async function extract(base64, mediaType) {
     .map((p) => p.text)
     .join("")
     .trim();
-  if (!text) throw new Error(`Gemini 응답에 텍스트가 없습니다 (finishReason=${finish ?? "?"}, 차단되었을 수 있음).`);
+  if (!text) throw taggedError(`Gemini 응답에 텍스트가 없습니다 (finishReason=${finish ?? "?"}, 차단되었을 수 있음).`, finish !== "SAFETY");
   if (finish && finish !== "STOP") log(`⚠️ finishReason=${finish} — 응답이 잘렸을 수 있음`);
 
   let parsed;
@@ -251,13 +280,48 @@ export async function extract(base64, mediaType) {
     log(`❌ JSON 파싱 실패: ${e.message}`);
     log(`   길이=${text.length}, 파트수=${cand?.content?.parts?.length}`);
     if (pos) log(`   문제 지점: …${text.slice(Math.max(0, pos - 80), pos + 80)}…`);
-    throw new Error(
-      `Gemini가 올바른 JSON을 주지 않았습니다 (finishReason=${finish}). 다시 시도해 주세요.`
-    );
+    throw taggedError(`Gemini가 올바른 JSON을 주지 않았습니다 (finishReason=${finish}).`, true);
   }
   const groups = normalizeGroups(parsed);
   log(`추출 완료: ${groups.length}개 그룹, 총 ${groups.reduce((n, g) => n + g.problems.length, 0)}문제`);
   return groups;
+}
+
+// 기본 모델로 3회, 그래도 안 되면 폴백 모델(별도 쿼터)로 2회 — 총 5회까지 시도.
+const EXTRACT_ATTEMPT_MODELS = [GEMINI_MODEL, GEMINI_MODEL, GEMINI_MODEL, GEMINI_FALLBACK_MODEL, GEMINI_FALLBACK_MODEL];
+
+export async function extract(base64, mediaType) {
+  let lastErr;
+  for (let i = 0; i < EXTRACT_ATTEMPT_MODELS.length; i++) {
+    const model = EXTRACT_ATTEMPT_MODELS[i];
+    try {
+      return await callGeminiOnce(base64, mediaType, model);
+    } catch (e) {
+      lastErr = e;
+      if (!e.retryable || i === EXTRACT_ATTEMPT_MODELS.length - 1) throw e;
+      log(`⚠️ Gemini 호출 실패 (model=${model}, ${i + 1}/${EXTRACT_ATTEMPT_MODELS.length}): ${e.message} — 재시도`);
+      await wait(500 * (i + 1)); // ponytail: 고정 백오프, 필요해지면 지수 백오프로
+    }
+  }
+  throw lastErr;
+}
+
+// 클라이언트(일반 사용자)에게 보여줄 한국어 안내문 — 기술 용어·원문 에러는 로그에만 남긴다.
+export function friendlyExtractError(err) {
+  const msg = String(err?.message || "");
+  if (/429|RESOURCE_EXHAUSTED|quota/i.test(msg)) {
+    return "지금 사용하는 사람이 많아서 응답이 늦어지고 있어요. 1~2분 후 다시 시도해 주세요. 계속 안 되면 '학년별 문제 만들기'로 랜덤 문제를 만들어 이용해보세요.";
+  }
+  if (/90초/.test(msg)) {
+    return "사진을 분석하는 데 시간이 너무 오래 걸렸어요. 다시 시도해 주세요.";
+  }
+  if (/GEMINI_API_KEY/.test(msg)) {
+    return "서버 설정에 문제가 있어요. 관리자에게 문의해 주세요.";
+  }
+  if (/텍스트가 없습니다|JSON을 주지 않았습니다/.test(msg)) {
+    return "사진에서 문제를 잘 읽지 못했어요. 밝은 곳에서 또렷하게 다시 찍어 주세요.";
+  }
+  return "문제를 인식하는 중 오류가 발생했어요. 잠시 후 다시 시도해 주세요.";
 }
 
 function readBody(req, limit = 20 * 1024 * 1024) {
@@ -353,6 +417,9 @@ const server = http.createServer(async (req, res) => {
         });
 
         await saveProblemsDB(db);
+        const stats = await loadStats();
+        stats.saves[grade] = (stats.saves[grade] || 0) + 1;
+        await saveStats(stats);
         log(`✓ 문제 저장: ${grade} (${added}세트 추가, ${skipped}세트 중복 제외, 총 ${db[grade].length}세트)`);
         res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify({ success: true, added, skipped }));
       } catch (err) {
@@ -371,7 +438,7 @@ const server = http.createServer(async (req, res) => {
         const statusCode = rateCheck.reason === "too_fast" ? 429 : 429;
         const errorMsg = rateCheck.reason === "too_fast"
           ? `요청이 너무 빠릅니다. ${Math.ceil(rateCheck.waitMs / 1000)}초 후 다시 시도하세요.`
-          : `시간당 요청 제한 도달. ${rateCheck.resetIn}초 후 초기화됩니다.`;
+          : `시간당 요청 제한 도달. ${rateCheck.resetIn}초 후 초기화됩니다. 계속 안 되면 '학년별 문제 만들기'로 랜덤 문제를 만들어 이용해보세요.`;
         log(`⚠️ Rate limit blocked for ${ip}: ${rateCheck.reason}`);
         res.writeHead(statusCode, { "content-type": "application/json" }).end(JSON.stringify({ error: errorMsg }));
         return;
@@ -379,7 +446,23 @@ const server = http.createServer(async (req, res) => {
 
       const { image, mediaType } = JSON.parse(await readBody(req));
       log(`/api/extract 수신 (${ip}): 이미지 ${Math.round((image?.length || 0) / 1024)}KB(base64), type=${mediaType || "image/jpeg"}`);
-      const groups = await extract(image, mediaType || "image/jpeg");
+
+      const stats = await loadStats();
+      stats.extract.attempts++;
+      let groups;
+      try {
+        groups = await extract(image, mediaType || "image/jpeg");
+        stats.extract.success++;
+        await saveStats(stats);
+      } catch (err) {
+        stats.extract.fail++;
+        await saveStats(stats);
+        log(`❌ /api/extract 실패 (${ip}): ${err.message}`);
+        res.writeHead(err.retryable === false ? 500 : 429, { "content-type": "application/json" }).end(
+          JSON.stringify({ error: friendlyExtractError(err) })
+        );
+        return;
+      }
       recordRequest(ip);
 
       // 문제 데이터 반환 (클라이언트가 학년 선택 후 저장하도록)
@@ -429,6 +512,17 @@ const server = http.createServer(async (req, res) => {
       res.writeHead(200, { "content-type": "application/json" }).end(
         JSON.stringify({ groups: [generatedGroup] })
       );
+      return;
+    }
+    if (req.method === "GET" && req.url.startsWith("/api/stats")) {
+      const url = new URL(req.url, `http://${req.headers.host}`);
+      const statsKey = process.env.STATS_KEY;
+      if (!statsKey || url.searchParams.get("key") !== statsKey) {
+        res.writeHead(404).end("not found");
+        return;
+      }
+      const stats = await loadStats();
+      res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(stats, null, 2));
       return;
     }
     if (req.method === "GET" && req.url === "/api/grades") {
