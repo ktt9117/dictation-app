@@ -164,8 +164,7 @@
     border-color: rgba(68, 138, 255, 0.3) !important;
   }
 
-  :root[data-theme="dark"] #backBtn,
-  :root[data-theme="dark"] #shareBtn {
+  :root[data-theme="dark"] #backBtn {
     background: rgba(68, 138, 255, 0.1) !important;
     border-color: rgba(68, 138, 255, 0.25) !important;
     color: #b0b0ff !important;
@@ -652,29 +651,6 @@
   }
 
   #backBtn:active {
-    transform: translateY(0);
-  }
-
-  #shareBtn {
-    background: rgba(68, 138, 255, 0.08);
-    border: 1px solid rgba(68, 138, 255, 0.2);
-    color: var(--neutral);
-    cursor: pointer;
-    padding: 0.5rem 0.75rem;
-    font-family: var(--sans);
-    font-size: 0.8rem;
-    font-weight: 600;
-    border-radius: var(--r-md);
-    transition: all 200ms ease-out;
-  }
-
-  #shareBtn:hover {
-    background: rgba(68, 138, 255, 0.12);
-    border-color: rgba(68, 138, 255, 0.3);
-    transform: translateY(-1px);
-  }
-
-  #shareBtn:active {
     transform: translateY(0);
   }
 
@@ -1425,6 +1401,30 @@
     border-color: rgba(68, 138, 255, 0.25) !important;
   }
 
+  /* App share button — theme-toggle과 같은 자리에 나란히, 항상 화면에 떠 있는 고정 버튼 */
+  .app-share-toggle {
+    position: fixed;
+    top: 1rem;
+    right: 3.75rem;
+    z-index: 150;
+    width: 2.25rem;
+    height: 2.25rem;
+    display: grid;
+    place-items: center;
+    font-size: 1.1rem;
+    line-height: 1;
+    background: white;
+    border: 1px solid rgba(68, 138, 255, 0.2);
+    border-radius: var(--r-full);
+    box-shadow: 0 2px 8px rgba(68, 138, 255, 0.15);
+    cursor: pointer;
+  }
+
+  :root[data-theme="dark"] .app-share-toggle {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.25) !important;
+  }
+
   /* 광고 미승인/미채움 상태의 예약 영역이 흰 박스로 보이는 것 방지 (!important로 애드센스 인라인 스타일과 경쟁) */
   .adsbygoogle {
     background: var(--primary) !important;
@@ -1444,6 +1444,7 @@
 </head>
 <body>
 <button id="themeToggle" class="theme-toggle" title="화면 모드 전환"></button>
+<button id="appShareBtn" class="app-share-toggle" title="앱 공유하기">🔗</button>
 <div id="processingBanner" class="processing-banner">
   <div class="processing-banner-title">⏳ 글자를 읽고 문제를 분류하는 중입니다</div>
   <div class="processing-banner-subtitle">다른 화면으로 이동하거나 앱을 종료하지 마세요</div>
@@ -1527,7 +1528,6 @@
 <div id="topNav" class="top-nav-container">
   <button id="backBtn">&lt; 돌아가기</button>
   <span id="currentSection" class="top-nav-section"></span>
-  <button id="shareBtn" title="공유하기">🔗 공유</button>
 </div>
 
 <div class="layout">
@@ -2221,16 +2221,15 @@ $("skipSave").onclick = () => {
 document.querySelector("h1").onclick = goHome;
 $("backBtn").onclick = goHome;
 
-$("shareBtn").onclick = async () => {
-  const title = $("currentSection").textContent || "받아쓰기 문제";
-  const text = groups
-    .map((g) => `[${g.title}]\n` + g.problems.map((p) => `${p.number}. ${p.text}`).join("\n"))
-    .join("\n\n");
+$("appShareBtn").onclick = async () => {
+  const title = "받아쓰기 연습";
+  const text = "사진 한 장으로 받아쓰기 문제 만들고 소리 내어 연습해요.";
+  const url = location.origin;
   if (navigator.share) {
-    try { await navigator.share({ title, text }); } catch { /* 사용자 취소 */ }
+    try { await navigator.share({ title, text, url }); } catch { /* 사용자 취소 */ }
   } else {
-    await navigator.clipboard.writeText(`${title}\n\n${text}`);
-    $("status").innerHTML = `<strong class="text-tertiary">✓ 문제 내용을 클립보드에 복사했어요</strong>`;
+    await navigator.clipboard.writeText(url);
+    $("status").innerHTML = `<strong class="text-tertiary">✓ 앱 링크를 클립보드에 복사했어요</strong>`;
   }
 };
 
