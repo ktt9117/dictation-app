@@ -340,6 +340,10 @@ function readBody(req, limit = 20 * 1024 * 1024) {
 
 const server = http.createServer(async (req, res) => {
   try {
+    if (req.method === "GET" && req.url === "/healthz") {
+      res.writeHead(200, { "content-type": "text/plain" }).end("OK");
+      return;
+    }
     if (req.method === "GET" && (req.url === "/" || req.url === "/index.html")) {
       const html = await readFile(new URL("./index.html", import.meta.url));
       res.writeHead(200, { "content-type": "text/html; charset=utf-8" }).end(html);
