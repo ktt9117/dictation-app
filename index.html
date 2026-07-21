@@ -75,7 +75,8 @@
 
   :root[data-theme="dark"] .row select,
   :root[data-theme="dark"] #gradeForSave,
-  :root[data-theme="dark"] #gradeSelect {
+  :root[data-theme="dark"] #gradeSelect,
+  :root[data-theme="dark"] .grade-select-input {
     background: #2a2a3e !important;
     border-color: rgba(68, 138, 255, 0.2) !important;
     color: #e8e8f0 !important;
@@ -842,6 +843,8 @@
     font-family: var(--sans);
     color: var(--secondary);
     box-shadow: 0 12px 32px rgba(68, 138, 255, 0.12);
+    max-width: 32rem;
+    width: 100%;
   }
 
   :root[data-theme="dark"] .modal-content {
@@ -884,7 +887,11 @@
   .modal-actions {
     display: flex;
     gap: 0.5rem;
-    flex-direction: column;
+  }
+
+  .modal-actions button {
+    flex: 1;
+    font-weight: 700;
   }
 
   /* Home saved list styles */
@@ -1423,11 +1430,8 @@
     display: grid;
   }
 
-  /* Modal content sizing */
-  .modal-content-sm {
-    max-width: 20rem;
-  }
-
+  /* Modal content sizing — photoGuideModal만 내용이 많아 더 넓게 쓴다. 나머지는
+     .modal-content 기본 크기를 공유한다. */
   .modal-content-lg {
     max-width: 56rem;
     margin: 1.25rem auto;
@@ -1435,6 +1439,18 @@
 
   .modal-overlay-scroll {
     overflow-y: auto;
+  }
+
+  /* 모바일 화면(폭이 좁아 모달이 화면을 꽉 채우는 구간)에서는 좌우 안쪽 여백을
+     절반으로 줄이고, 줄어든 만큼을 화면 가장자리와의 바깥 여백으로 돌려준다. */
+  @media (max-width: 52rem) {
+    .modal-content {
+      width: calc(100% - 1.5rem);
+      padding-left: 0.75rem;
+      padding-right: 0.75rem;
+      margin-left: 0.75rem;
+      margin-right: 0.75rem;
+    }
   }
 
   /* Button groups */
@@ -1551,7 +1567,7 @@
 </div>
 
 <div id="deleteConfirmModal" class="modal-overlay">
-  <div class="modal-content modal-content-sm">
+  <div class="modal-content">
     <div class="modal-title warning">⚠️ 정말 삭제하시겠어요?</div>
     <div id="deleteConfirmName" class="modal-description"></div>
     <div class="modal-actions">
@@ -1564,12 +1580,28 @@
 <!-- 네이티브 prompt()는 안드로이드에서 팝업 상단에 도메인 주소를 노출시켜서
      대신 쓰는 인앱 모달 -->
 <div id="renameModal" class="modal-overlay">
-  <div class="modal-content modal-content-sm">
+  <div class="modal-content">
     <div class="modal-title">이름 변경</div>
     <input type="text" id="renameInput" class="grade-select-input w-full mb-lg" />
     <div class="modal-actions">
       <button id="renameConfirm" class="btn-primary btn-md">저장</button>
       <button id="renameCancel" class="btn-ghost btn-md">취소</button>
+    </div>
+  </div>
+</div>
+
+<div id="manualEntryModal" class="modal-overlay">
+  <div class="modal-content">
+    <div class="modal-title">문제 직접 입력하기</div>
+    <div class="grade-select-controls mb-sm">
+      <input type="text" id="manualProblemInput" class="grade-select-input" placeholder="문제 문장을 입력하고 추가를 누르세요" />
+      <button id="manualAddProblem" class="btn-primary grade-select-btn">추가</button>
+    </div>
+    <div id="manualProblemList" class="flex-col gap-sm mb-sm"></div>
+    <div id="manualEntryError" class="text-accent text-xs mb-sm" hidden></div>
+    <div class="modal-actions">
+      <button id="manualEntryConfirm" class="btn-primary btn-md">완료</button>
+      <button id="manualEntryCancel" class="btn-ghost btn-md">취소</button>
     </div>
   </div>
 </div>
@@ -1682,6 +1714,13 @@
   </div>
   <input type="file" id="file" accept="image/*" hidden />
   <input type="file" id="fileCapture" accept="image/*" capture="environment" hidden />
+
+  <div class="home-cta-section">
+    <div class="grade-select-label">문제를 직접 만들고 싶다면?</div>
+    <div class="button-row">
+      <button class="pick" id="manualEntryBtn">직접 입력하기</button>
+    </div>
+  </div>
 </div>
 
 <div class="status" id="status"></div>
@@ -2160,6 +2199,78 @@ $("photoGuideModal").onclick = (e) => {
     $("photoGuideModal").style.display = "none";
   }
 };
+let manualProblems = []; // 모달에서 하나씩 추가 중인 문제 문장 목록
+
+function renderManualProblemList() {
+  const list = $("manualProblemList");
+  list.innerHTML = "";
+  manualProblems.forEach((text, i) => {
+    const row = document.createElement("div");
+    row.className = "row";
+    const txt = document.createElement("div");
+    txt.className = "flex-1";
+    txt.textContent = `${i + 1}. ${text}`;
+    const delBtn = document.createElement("button");
+    delBtn.className = "btn-ghost home-saved-delete";
+    delBtn.textContent = "✕";
+    delBtn.onclick = () => { manualProblems.splice(i, 1); renderManualProblemList(); };
+    row.append(txt, delBtn);
+    list.appendChild(row);
+  });
+}
+
+function addManualProblem() {
+  const text = $("manualProblemInput").value.trim();
+  if (!text) return;
+  manualProblems.push(text);
+  $("manualProblemInput").value = "";
+  $("manualEntryError").hidden = true;
+  renderManualProblemList();
+  $("manualProblemInput").focus();
+}
+
+$("manualEntryBtn").onclick = () => {
+  manualProblems = [];
+  renderManualProblemList();
+  $("manualProblemInput").value = "";
+  $("manualEntryError").hidden = true;
+  $("manualEntryModal").style.display = "flex";
+  $("manualProblemInput").focus();
+};
+
+$("manualAddProblem").onclick = addManualProblem;
+$("manualProblemInput").onkeydown = (e) => {
+  if (e.key === "Enter") { e.preventDefault(); addManualProblem(); }
+};
+
+$("manualEntryCancel").onclick = () => { $("manualEntryModal").style.display = "none"; };
+
+$("manualEntryModal").onclick = (e) => {
+  if (e.target === $("manualEntryModal")) $("manualEntryModal").style.display = "none";
+};
+
+$("manualEntryConfirm").onclick = () => {
+  if (manualProblems.length === 0) {
+    $("manualEntryError").textContent = "문제를 최소 1개 이상 추가해 주세요.";
+    $("manualEntryError").hidden = false;
+    return;
+  }
+
+  const group = {
+    title: `직접 입력 ${manualProblems.length}문제`,
+    problems: manualProblems.map((text, i) => ({ number: i + 1, text })),
+  };
+  groups = [group];
+  current = 0;
+  $("manualEntryModal").style.display = "none";
+  $("status").textContent = `${manualProblems.length}문제를 직접 입력했어요.`;
+  $("gradeSelectUI").style.display = "block";
+  withViewTransition(() => {
+    showNav(group.title);
+    render();
+  });
+};
+
 // ponytail: hash extracted groups to detect duplicates in saved sets.
 function hashGroups(gs) {
   return gs.map(g => g.problems.map(p => p.text).sort().join("•")).sort().join("•");
