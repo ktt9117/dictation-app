@@ -1557,6 +1557,40 @@
   ins.adsbygoogle[data-ad-status="unfilled"] {
     display: none !important;
   }
+
+  /* 광고 위 항상 노출되는 실 콘텐츠 블록 — "게시자 콘텐츠 없는 화면에 광고" 정책 대응.
+     홈/상세 화면 전환과 무관하게 항상 렌더링되어, 광고 바로 위에 빈 div가 아니라
+     실제 텍스트 콘텐츠가 오도록 보장한다. */
+  .dictation-tips {
+    margin-top: 1.75rem;
+    padding: 0.9rem 1rem;
+    background: white;
+    border-radius: var(--r-md);
+    border: 1px solid rgba(68, 138, 255, 0.15);
+  }
+
+  :root[data-theme="dark"] .dictation-tips {
+    background: #2a2a3e !important;
+    border-color: rgba(68, 138, 255, 0.2) !important;
+  }
+
+  .dictation-tips-list {
+    margin: 0;
+    padding-left: 1.1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+  }
+
+  .dictation-tips-list li {
+    line-height: 1.5;
+  }
+
+  /* 콘텐츠 없이 광고만 노출되는 상태(OCR 처리 중 등)를 방지하기 위해 JS가
+     이 클래스로 광고 영역 자체를 숨긴다. */
+  #adSlot.ad-hidden {
+    display: none;
+  }
 </style>
 </head>
 <body>
@@ -1781,6 +1815,19 @@
 <div class="grouptitle" id="groupTitle"></div>
 <div id="list"></div>
 
+<!-- 광고 바로 위에 항상 존재하는 실제 콘텐츠. 홈/상세 어느 상태에서도 빈 화면
+     옆에 광고가 붙지 않도록 보장한다 (AdSense "게시자 콘텐츠 없는 화면" 정책 대응). -->
+<div id="dictationTips" class="dictation-tips">
+  <div class="grade-select-label">받아쓰기 학습 팁</div>
+  <ul class="dictation-tips-list text-secondary text-xs">
+    <li>먼저 문장을 끝까지 듣고 전체 뜻을 이해한 뒤 받아쓰세요.</li>
+    <li>안 들리는 부분은 반복 재생 기능으로 여러 번 다시 들어보세요.</li>
+    <li>다 쓴 뒤에는 정답을 확인하고, 틀린 단어만 따로 모아 다시 연습하면 효과적이에요.</li>
+    <li>한 번에 몰아서 하기보다 매일 5~10분씩 꾸준히 연습하는 것이 기억에 더 오래 남아요.</li>
+  </ul>
+</div>
+
+<div id="adSlot">
 <ins class="adsbygoogle"
      style="display:block; margin-top:1.5rem"
      data-ad-client="ca-pub-7166460126134807"
@@ -1788,7 +1835,7 @@
      data-ad-format="auto"
      data-full-width-responsive="true"
      data-tag-for-age-treatment="1"></ins>
-<script>(adsbygoogle = window.adsbygoogle || []).push({});</script>
+</div>
   </main>
 </div>
 
@@ -1808,6 +1855,8 @@ const curProblems = () => (groups[current]?.problems ?? []);
 function setProcessingState(processing) {
   isProcessing = processing;
   $("processingBanner").style.display = processing ? "block" : "none";
+  // 처리 중 배너만 있는 "알림/로딩" 화면에는 광고를 노출하지 않는다 (AdSense 정책).
+  $("adSlot").classList.toggle("ad-hidden", processing);
 
   // 모든 인터랙티브 요소 비활성화
   const buttons = document.querySelectorAll("button:not(#closeBanner)");
@@ -2762,6 +2811,11 @@ $("generateRandom").onclick = async () => {
 
 // 페이지 로드 시 학년 목록 조회
 loadGrades();
+
+// 광고 요청은 홈 화면 초기 콘텐츠(히어로/저장된 세트/학습 팁)가 모두 렌더링된
+// 뒤에 보낸다 — 페이지 파싱 도중 곧바로 push하면 콘텐츠가 채워지기 전 "빈
+// 화면" 상태로 광고가 요청될 수 있다 (AdSense "게시자 콘텐츠 없는 화면" 정책).
+(adsbygoogle = window.adsbygoogle || []).push({});
 </script>
 </body>
 </html>
